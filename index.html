@@ -1,0 +1,1630 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Wavelength — Equipos</title>
+  <style>
+    :root{
+      --bg:#0b0f17;
+      --panel: rgba(255,255,255,.07);
+      --line: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --shadow: 0 16px 44px rgba(0,0,0,.40);
+      --shadow2: 0 18px 60px rgba(0,0,0,.50);
+      --radius2: 26px;
+      --focus: 2px solid rgba(120,200,255,.9);
+      --anim: 180ms cubic-bezier(.2,.8,.2,1);
+
+      --a: #7dd3fc;
+      --b: #a78bfa;
+
+      /* Dial (physical-ish) */
+      --dialFace: #efe9dc;
+      --dialFaceEdge: rgba(0,0,0,.08);
+      --dialWindow2: #ffb44d;
+      --dialWindow3: #ff7a3c;
+      --dialWindow4: #6bb6ff;
+      --dialNeedle: #cf3b3b;
+      --dialNeedle2: rgba(255,255,255,.55);
+      --dialCenter: #c73737;
+      --dialTextDark: rgba(0,0,0,.78);
+    }
+
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f7fb;
+        --panel: rgba(0,0,0,.05);
+        --line: rgba(0,0,0,.12);
+        --text: rgba(0,0,0,.88);
+        --muted: rgba(0,0,0,.60);
+        --shadow: 0 14px 36px rgba(0,0,0,.14);
+        --shadow2: 0 18px 56px rgba(0,0,0,.18);
+      }
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(900px 650px at 18% -10%, rgba(125,211,252,.25), transparent 60%),
+        radial-gradient(900px 650px at 88% -10%, rgba(167,139,250,.22), transparent 60%),
+        radial-gradient(800px 600px at 50% 110%, rgba(52,211,153,.14), transparent 65%),
+        var(--bg);
+      color: var(--text);
+      line-height:1.35;
+    }
+
+    .wrap{ max-width: 1180px; margin: 0 auto; padding: 16px 14px 32px; }
+
+    header{
+      display:flex; align-items:center; justify-content: space-between;
+      gap:10px; flex-wrap: wrap; margin-bottom: 14px;
+    }
+    .brand{ display:flex; align-items:center; gap:10px; }
+    .logo{
+      width: 42px; height: 42px; border-radius: 16px;
+      border:1px solid var(--line);
+      background:
+        radial-gradient(16px 16px at 30% 30%, rgba(255,255,255,.55), transparent 60%),
+        radial-gradient(24px 24px at 70% 35%, rgba(125,211,252,.55), transparent 60%),
+        radial-gradient(26px 26px at 45% 75%, rgba(167,139,250,.48), transparent 62%),
+        rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+    }
+    .brand h1{ margin:0; font-size:16px; font-weight:900; letter-spacing:.2px; }
+    .brand p{ margin:0; font-size:12px; color: var(--muted); }
+
+    .top-actions{ display:flex; gap:8px; flex-wrap: wrap; align-items:center; }
+
+    .btn{
+      appearance:none;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing:.15px;
+      cursor:pointer;
+      transition: transform var(--anim), background var(--anim), border-color var(--anim);
+      box-shadow: 0 10px 22px rgba(0,0,0,.16);
+    }
+    .btn:hover{ background: rgba(255,255,255,.11); transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0); }
+    .btn:focus-visible{ outline: var(--focus); outline-offset:2px; }
+    .btn.primary{
+      border-color: rgba(125,211,252,.55);
+      background: linear-gradient(180deg, rgba(125,211,252,.20), rgba(255,255,255,.06));
+    }
+    .btn.alt{
+      border-color: rgba(167,139,250,.55);
+      background: linear-gradient(180deg, rgba(167,139,250,.18), rgba(255,255,255,.06));
+    }
+    .btn.ghost{ background: transparent; box-shadow:none; }
+    .btn.danger{
+      border-color: rgba(251,113,133,.55);
+      background: linear-gradient(180deg, rgba(251,113,133,.18), rgba(255,255,255,.06));
+    }
+    .btn.small{ padding: 8px 10px; border-radius: 12px; font-size: 12px; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+
+    .card{
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, var(--panel), transparent 140%);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow: clip;
+    }
+    .card .hd{
+      padding: 14px 14px 10px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), transparent);
+    }
+    .title{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+    .title b{ font-size:14px; letter-spacing:.2px; }
+    .title span{ font-size:12px; color: var(--muted); }
+    .card .bd{ padding: 14px; }
+
+    .row{ display:flex; align-items:center; gap:10px; flex-wrap: wrap; }
+    .col{ display:flex; flex-direction:column; gap:10px; }
+    .grow{ flex:1 1 auto; min-width: 220px; }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      user-select:none;
+      white-space: nowrap;
+    }
+    .pill strong{ color: var(--text); font-weight: 900; }
+
+    .notice{
+      border-radius: 18px;
+      border: 1px dashed rgba(125,211,252,.35);
+      background: rgba(125,211,252,.08);
+      padding: 10px 12px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    label{ font-size:12px; color: var(--muted); display:block; margin-bottom:6px; }
+    .input{
+      width:100%;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 13px;
+      outline:none;
+    }
+    .input:focus{
+      border-color: rgba(125,211,252,.55);
+      background: rgba(255,255,255,.07);
+    }
+    .hr{ height:1px; background: var(--line); margin: 10px 0; }
+
+    .dial{
+      width: min(100%, 620px);
+      margin: 0 auto;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      box-shadow: var(--shadow2);
+      padding: 14px 12px 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .dial::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(700px 260px at 50% 110%, rgba(255,255,255,.08), transparent 60%),
+        radial-gradient(340px 260px at 12% 0%, rgba(125,211,252,.08), transparent 65%),
+        radial-gradient(360px 280px at 88% 0%, rgba(167,139,250,.08), transparent 65%);
+      opacity:.9;
+    }
+    .dialInner{ position: relative; z-index: 1; }
+    .dialSvg{ width: 100%; height: auto; display:block; }
+
+    .dialLabels{
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .dialLabels .side{
+      max-width: 46%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .dialLabels .mid{ font-weight: 900; color: rgba(255,255,255,.55); }
+    @media (prefers-color-scheme: light){
+      .dialLabels .mid{ color: rgba(0,0,0,.45); }
+    }
+
+    .legend{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content:center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .lg{
+      display:inline-flex;
+      gap: 8px;
+      align-items:center;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      border-radius: 999px;
+    }
+    .sw{ width: 12px; height: 12px; border-radius: 4px; display:inline-block; }
+    .sw.w2{ background: var(--dialWindow2); }
+    .sw.w3{ background: var(--dialWindow3); }
+    .sw.w4{ background: var(--dialWindow4); }
+
+    .sliderRow{
+      width: min(100%, 620px);
+      margin: 0 auto;
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    input[type="range"]{ width:100%; accent-color: #7dd3fc; }
+    .numRow{
+      display:flex; justify-content: space-between; align-items:center;
+      font-size: 12px; color: var(--muted);
+    }
+    .numRow b{ color: var(--text); font-weight: 900; }
+
+    .teamBox{
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      padding: 12px;
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .teamTop{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .nameRow{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .dot{ width:10px; height:10px; border-radius:50%; background: var(--a); }
+    .dot.b{ background: var(--b); }
+    .tname{ font-size: 13px; font-weight: 900; white-space: nowrap; overflow:hidden; text-overflow: ellipsis; }
+    .tscore{ font-size: 24px; font-weight: 950; letter-spacing:.2px; }
+    .meta{
+      font-size: 12px; color: var(--muted);
+      display:flex; justify-content: space-between; align-items:center; gap: 10px;
+    }
+    .meta b{ color: var(--text); }
+    .meta .ps{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+
+    .history{
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .hitem{
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      padding: 10px 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .hitem b{ color: var(--text); }
+    .hrow{ display:flex; justify-content: space-between; gap:10px; flex-wrap:wrap; }
+    .mono{ font-variant-numeric: tabular-nums; }
+
+    .modalBackdrop{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 50;
+    }
+    .modalBackdrop.show{ display:flex; }
+    .modal{
+      width:min(880px, 100%);
+      max-height: min(86vh, 780px);
+      overflow:auto;
+      border-radius: 22px;
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      box-shadow: var(--shadow2);
+    }
+    .modal .mhd{
+      padding: 14px 14px 10px;
+      display:flex; align-items:center; justify-content: space-between; gap:10px;
+      border-bottom:1px solid var(--line);
+      position: sticky; top:0;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(0,0,0,.22), transparent);
+    }
+    @media (prefers-color-scheme: light){
+      .modal .mhd{ background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.24)); }
+    }
+    .modal .mbd{ padding: 14px; }
+    .modal h3{ margin:10px 0 6px; font-size: 13px; }
+    .modal li{ font-size: 12.5px; color: var(--muted); }
+    .modal ul{ margin: 8px 0 0 18px; padding: 0; }
+
+    .toast{
+      position: fixed;
+      left:50%; bottom:18px;
+      transform: translateX(-50%);
+      max-width: min(820px, calc(100% - 24px));
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.55);
+      color: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow2);
+      display:none;
+      z-index: 80;
+      font-size: 12.5px;
+    }
+    @media (prefers-color-scheme: light){
+      .toast{ background: rgba(255,255,255,.84); color: rgba(0,0,0,.88); }
+    }
+    .toast.show{ display:block; animation: popIn 220ms cubic-bezier(.2,.8,.2,1); }
+    @keyframes popIn{
+      from{ transform: translateX(-50%) translateY(8px); opacity:0; }
+      to{ transform: translateX(-50%) translateY(0); opacity:1; }
+    }
+
+    .passOverlay{
+      position: fixed; inset:0;
+      z-index: 90;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      background:
+        radial-gradient(1000px 700px at 20% 0%, rgba(125,211,252,.24), transparent 62%),
+        radial-gradient(1000px 700px at 90% 0%, rgba(167,139,250,.22), transparent 62%),
+        rgba(0,0,0,.64);
+      backdrop-filter: blur(10px);
+    }
+    .passOverlay.show{ display:flex; }
+    .passCard{
+      width: min(720px, 100%);
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+      box-shadow: var(--shadow2);
+      padding: 16px;
+    }
+    .passCard h2{
+      margin:0;
+      font-size: 18px;
+      letter-spacing:.2px;
+    }
+    .passCard p{
+      margin: 8px 0 0;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+    }
+    .passCard .row{ margin-top: 14px; justify-content: space-between; }
+    .passCard .big{
+      font-size: 13px;
+      color: rgba(255,255,255,.85);
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" role="application" aria-label="Wavelength por equipos">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Wavelength</h1>
+          <p>Equipos (A/B) — apuesta rival LEFT/RIGHT para robar puntos.</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="btn ghost small" id="btnRules" aria-haspopup="dialog" aria-controls="modalRules">Instrucciones</button>
+        <button class="btn small" id="btnFullscreen">Pantalla completa</button>
+        <button class="btn danger small" id="btnReset">Reset</button>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card" aria-label="Panel principal">
+        <div class="hd">
+          <div class="title">
+            <b id="phaseTitle">Cargando…</b>
+            <span id="phaseSubtitle">—</span>
+          </div>
+          <div class="row">
+            <span class="pill" id="pillTurn"><strong>Turno:</strong> —</span>
+            <span class="pill" id="pillGoal"><strong>Objetivo:</strong> 10</span>
+          </div>
+        </div>
+        <div class="bd" id="mainArea"></div>
+      </section>
+
+      <aside class="card" aria-label="Marcador">
+        <div class="hd">
+          <div class="title">
+            <b>Marcador</b>
+            <span id="scoreSubtitle">Primero a 10 puntos</span>
+          </div>
+          <div class="row">
+            <button class="btn small" id="btnPass">Pasar dispositivo</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="col">
+            <div class="teamBox">
+              <div class="teamTop">
+                <div class="nameRow">
+                  <span class="dot" aria-hidden="true"></span>
+                  <div class="tname" id="aName">Equipo A</div>
+                </div>
+                <div class="tscore mono" id="aScore">0</div>
+              </div>
+              <div class="meta">
+                <span class="ps">Psíquico: <b id="aPsychic">1</b> <button class="btn small" id="btnNextPA">Siguiente Psíquico</button></span>
+                <span class="pill"><strong>Turnos:</strong> <span id="aTurns">0</span></span>
+              </div>
+            </div>
+
+            <div class="teamBox">
+              <div class="teamTop">
+                <div class="nameRow">
+                  <span class="dot b" aria-hidden="true"></span>
+                  <div class="tname" id="bName">Equipo B</div>
+                </div>
+                <div class="tscore mono" id="bScore">1</div>
+              </div>
+              <div class="meta">
+                <span class="ps">Psíquico: <b id="bPsychic">1</b> <button class="btn small" id="btnNextPB">Siguiente Psíquico</button></span>
+                <span class="pill"><strong>Turnos:</strong> <span id="bTurns">0</span></span>
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="legend" aria-label="Leyenda de puntuación">
+              <span class="lg"><span class="sw w4"></span>4 pts ±3</span>
+              <span class="lg"><span class="sw w3"></span>3 pts ±6</span>
+              <span class="lg"><span class="sw w2"></span>2 pts ±10</span>
+            </div>
+
+            <div class="notice">
+              Rival roba <b>+1</b> si acierta LEFT/RIGHT (objetivo a la izquierda/derecha de la aguja), <b>excepto</b> si el equipo activo hace 4 puntos.
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="title" style="padding:0 2px;">
+              <b>Historial (últimas 5)</b>
+              <span>carta · objetivo · posición · puntos · robo</span>
+            </div>
+            <div class="history" id="hist"></div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div class="modalBackdrop" id="modalRules" role="dialog" aria-modal="true" aria-labelledby="modalRulesTitle">
+    <div class="modal">
+      <div class="mhd">
+        <b id="modalRulesTitle">Reglas — Equipos A/B</b>
+        <button class="btn small" id="btnCloseRules">Cerrar</button>
+      </div>
+      <div class="mbd">
+        <h3>Setup</h3>
+        <ul>
+          <li>Objetivo: <b>10</b> puntos (editable).</li>
+          <li>Handicap inicial: <b>Equipo A = 0</b>, <b>Equipo B = 1</b> (como en el juego original).</li>
+          <li>Roles: cada turno un equipo es <b>activo</b>. Su <b>Psíquico</b> ve el objetivo y da la pista. Su equipo <b>adivina</b>. El rival solo hace una apuesta <b>LEFT/RIGHT</b>.</li>
+        </ul>
+
+        <h3>Flujo de turno</h3>
+        <ul>
+          <li><b>1) Carta:</b> se muestra el par de extremos.</li>
+          <li><b>2) Psíquico (secreto):</b> se genera objetivo aleatorio 0–100 y solo lo ve el psíquico.</li>
+          <li><b>3) Equipo:</b> ajusta la aguja (0–100) y bloquea.</li>
+          <li><b>4) Rival:</b> apuesta LEFT/RIGHT (si el objetivo está a la izquierda o a la derecha de la aguja).</li>
+          <li><b>5) Revelación:</b> se muestran objetivo y posición, se calculan puntos y robo.</li>
+        </ul>
+
+        <h3>Puntuación</h3>
+        <ul>
+          <li>±3: <b>4 puntos</b>, ±6: <b>3 puntos</b>, ±10: <b>2 puntos</b>, fuera: <b>0</b>.</li>
+          <li>El rival gana <b>+1</b> si acierta LEFT/RIGHT, <b>excepto</b> si el equipo activo obtiene <b>4</b>.</li>
+        </ul>
+
+        <h3>Catch-up y fin</h3>
+        <ul>
+          <li>Si el equipo activo obtiene <b>4</b> y aun así va <b>perdiendo</b> tras puntuar, juega otra ronda inmediatamente (mismo equipo, siguiente psíquico).</li>
+          <li>Si alguien llega a <b>10+</b>, termina. Si hay empate, entra en <b>sudden death</b> (rondas hasta desempatar).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="passOverlay" id="passOverlay" role="dialog" aria-modal="true" aria-label="Pasar dispositivo">
+    <div class="passCard">
+      <h2 id="passTitle">Pasar dispositivo</h2>
+      <p id="passText">—</p>
+      <div class="row">
+        <div class="big" id="passHint">Asegúrate de que solo mire quien toca.</div>
+        <button class="btn primary" id="btnPassContinue">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      /* ===== Content ===== */
+      const CARDS = [
+        { left:"Frío", right:"Caliente" },
+        { left:"Aburrido", right:"Emocionante" },
+        { left:"Inofensivo", right:"Peligroso" },
+        { left:"Común", right:"Raro" },
+        { left:"Débil", right:"Fuerte" },
+        { left:"Simple", right:"Complejo" },
+        { left:"Tradicional", right:"Innovador" },
+        { left:"Caro", right:"Barato" },
+        { left:"Serio", right:"Cómico" },
+        { left:"Ordenado", right:"Caótico" },
+        { left:"Egoísta", right:"Altruista" },
+        { left:"Lento", right:"Rápido" },
+        { left:"Seguro", right:"Arriesgado" },
+        { left:"Formal", right:"Informal" },
+        { left:"Amigable", right:"Hostil" },
+        { left:"Sutil", right:"Exagerado" },
+        { left:"Fácil", right:"Difícil" },
+        { left:"De mal gusto", right:"Elegante" },
+        { left:"Relajante", right:"Estresante" },
+        { left:"Predecible", right:"Impredecible" },
+        { left:"Infantil", right:"Adulto" },
+        { left:"Moderno", right:"Retro" },
+        { left:"Realista", right:"Fantástico" },
+        { left:"Optimista", right:"Pesimista" },
+        { left:"Honesto", right:"Engañoso" },
+        { left:"Conservador", right:"Rebelde" },
+        { left:"Silencioso", right:"Ruidoso" },
+        { left:"Íntimo", right:"Público" },
+        { left:"Casual", right:"Solemne" },
+        { left:"Suave", right:"Brusco" },
+        { left:"Delicado", right:"Robusto" },
+        { left:"Abstracto", right:"Concreto" },
+        { left:"Limpio", right:"Sucio" },
+        { left:"Natural", right:"Artificial" },
+        { left:"Agradable", right:"Desagradable" },
+        { left:"Racional", right:"Emocional" },
+        { left:"Amable", right:"Cruel" },
+        { left:"Flexible", right:"Rígido" },
+        { left:"Minimalista", right:"Recargado" },
+        { left:"Local", right:"Global" },
+        { left:"Clásico", right:"Vanguardista" },
+        { left:"Tierno", right:"Intimidante" },
+        { left:"Práctico", right:"Impráctico" },
+        { left:"Popular", right:"De nicho" },
+        { left:"Cotidiano", right:"Épico" },
+        { left:"Atemporal", right:"De moda" },
+        { left:"Aire libre", right:"Interior" },
+        { left:"Individual", right:"En equipo" },
+        { left:"Aventurero", right:"Cauteloso" },
+        { left:"Directo", right:"Ambiguo" },
+        { left:"Atractivo", right:"Repulsivo" },
+        { left:"Futurista", right:"Antiguo" },
+        { left:"Eficiente", right:"Ineficiente" },
+        { left:"Duro", right:"Blando" },
+        { left:"Sincero", right:"Diplomático" },
+        { left:"Exclusivo", right:"Inclusivo" },
+        { left:"Intenso", right:"Ligero" },
+        { left:"Frágil", right:"Resistente" },
+        { left:"Estable", right:"Volátil" },
+        { left:"Metódico", right:"Impulsivo" },
+        { left:"Sano", right:"Indulgente" },
+        { left:"Lógico", right:"Intuitivo" },
+        { left:"Pulido", right:"Desaliñado" },
+        { left:"Cercano", right:"Distante" },
+        { left:"Profesional", right:"Amateur" },
+        { left:"Humilde", right:"Presumido" },
+        { left:"Confiable", right:"Inestable" },
+        { left:"Científico", right:"Místico" },
+        { left:"Transparente", right:"Opaco" },
+        { left:"Carismático", right:"Insulso" },
+        { left:"Valiente", right:"Cobarde" },
+        { left:"Curioso", right:"Indiferente" },
+        { left:"Creativo", right:"Convencional" },
+      ];
+
+      /* ===== Rules config (reduced bands, as per your final dial) ===== */
+      const DEFAULT_GOAL = 10;
+      const START_SCORES = [0, 1]; // A=0, B=1 handicap
+      const WEDGES = { w4: 3, w3: 6, w2: 10 }; // ±3 / ±6 / ±10
+
+      /* ===== Utils ===== */
+      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+      const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+      const $ = (sel, root=document) => root.querySelector(sel);
+
+      function escapeHtml(s){
+        return String(s).replace(/[&<>"']/g, m => ({
+          "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+        }[m]));
+      }
+
+      // 0..100 -> radians on upper semicircle: 0=left(π), 50=up(π/2), 100=right(0)
+      function valueToRad(v){
+        const x = clamp(v,0,100)/100;
+        return Math.PI * (1 - x);
+      }
+
+      function randomTarget(){ return rnd(0, 100); }
+
+      function scoreGuess(target, guess){
+        const d = Math.abs(clamp(target,0,100) - clamp(guess,0,100));
+        if (d <= WEDGES.w4) return { teamPoints: 4, wedge: "4" };
+        if (d <= WEDGES.w3) return { teamPoints: 3, wedge: "3" };
+        if (d <= WEDGES.w2) return { teamPoints: 2, wedge: "2" };
+        return { teamPoints: 0, wedge: "0" };
+      }
+
+      function leftRightBet(target, guess){
+        if (target < guess) return "LEFT";
+        if (target > guess) return "RIGHT";
+        return "EITHER"; // exact match
+      }
+
+      function applyCatchUpRule(scores, activeTeam, gainedPoints){
+        // Only triggers when active team gains 4 AND is still losing after applying points.
+        if (gainedPoints !== 4) return false;
+        const a = scores[activeTeam];
+        const b = scores[1-activeTeam];
+        return a < b;
+      }
+
+      function isTieAtGoalOrAbove(scores, goal){
+        return scores[0] >= goal && scores[1] >= goal && scores[0] === scores[1];
+      }
+
+      function hasWinner(scores, goal){
+        if (scores[0] >= goal || scores[1] >= goal){
+          if (scores[0] !== scores[1]) return true;
+        }
+        return false;
+      }
+
+      function winnerIndex(scores){
+        if (scores[0] === scores[1]) return null;
+        return scores[0] > scores[1] ? 0 : 1;
+      }
+
+      /* ===== SVG Dial helpers ===== */
+      function polarPoint(cx, cy, r, rad){
+        return { x: cx + Math.cos(rad)*r, y: cy - Math.sin(rad)*r };
+      }
+
+      function donutSectorPath(cx, cy, rOuter, rInner, startRad, endRad){
+        let s = startRad, e = endRad;
+        if (s < e) { const tmp=s; s=e; e=tmp; }
+
+        const p1o = polarPoint(cx, cy, rOuter, s);
+        const p2o = polarPoint(cx, cy, rOuter, e);
+        const p2i = polarPoint(cx, cy, rInner, e);
+        const p1i = polarPoint(cx, cy, rInner, s);
+
+        const delta = Math.abs(e - s);
+        const largeArc = delta > Math.PI ? 1 : 0;
+
+        return [
+          `M ${p1o.x.toFixed(2)} ${p1o.y.toFixed(2)}`,
+          `A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${p2o.x.toFixed(2)} ${p2o.y.toFixed(2)}`,
+          `L ${p2i.x.toFixed(2)} ${p2i.y.toFixed(2)}`,
+          `A ${rInner} ${rInner} 0 ${largeArc} 0 ${p1i.x.toFixed(2)} ${p1i.y.toFixed(2)}`,
+          "Z"
+        ].join(" ");
+      }
+
+      function needleLineSVG(value, r1, r2, stroke, strokeWidth, opacity=1){
+        const cx=200, cy=200;
+        const rad = valueToRad(value);
+        const p1 = polarPoint(cx, cy, r1, rad);
+        const p2 = polarPoint(cx, cy, r2, rad);
+        return `<line x1="${p1.x.toFixed(2)}" y1="${p1.y.toFixed(2)}" x2="${p2.x.toFixed(2)}" y2="${p2.y.toFixed(2)}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" opacity="${opacity}"></line>`;
+      }
+
+      function scoringFanSVG(targetVal){
+        const cx=200, cy=200;
+        const radPerVal = Math.PI / 100;
+        const halfSpan = WEDGES.w2 * radPerVal; // ±10
+
+        const cRad = valueToRad(targetVal);
+
+        let fanStart = cRad + halfSpan;
+        let fanEnd   = cRad - halfSpan;
+
+        // shift window to remain within [0..π]
+        if (fanStart > Math.PI) {
+          const shift = fanStart - Math.PI;
+          fanStart = Math.PI;
+          fanEnd += shift;
+        }
+        if (fanEnd < 0) {
+          const shift = -fanEnd;
+          fanEnd = 0;
+          fanStart -= shift;
+        }
+        fanStart = clamp(fanStart, 0, Math.PI);
+        fanEnd   = clamp(fanEnd,   0, Math.PI);
+
+        const rOuter = 160;
+        const rInner = 85;
+
+        const totalSpan = Math.abs(fanStart - fanEnd);
+        const weights = [1.15, 0.95, 1.05, 0.95, 1.15];
+        const wsum = weights.reduce((a,b)=>a+b,0);
+        const spans = weights.map(w => totalSpan*(w/wsum));
+
+        const colors = [
+          "var(--dialWindow2)",
+          "var(--dialWindow3)",
+          "var(--dialWindow4)",
+          "var(--dialWindow3)",
+          "var(--dialWindow2)"
+        ];
+        const labels = ["2","3","4","3","2"];
+
+        let cur = fanStart;
+        const parts = [];
+
+        for (let i=0;i<5;i++){
+          const next = cur - spans[i];
+          const s = cur;
+          const e = next;
+
+          const path = donutSectorPath(cx, cy, rOuter, rInner, s, e);
+          const mid = (s+e)/2;
+          const p = polarPoint(cx, cy, (rOuter+rInner)/2 + 2, mid);
+
+          parts.push(`
+            <path d="${path}" fill="${colors[i]}" opacity="0.95"></path>
+            <text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}"
+                  text-anchor="middle" dominant-baseline="middle"
+                  font-size="14" font-weight="900"
+                  fill="var(--dialTextDark)">
+              ${labels[i]}
+            </text>
+          `);
+
+          cur = next;
+        }
+
+        const outline = donutSectorPath(cx, cy, rOuter, rInner, fanStart, fanEnd);
+
+        return `
+          <g>
+            <path d="${outline}" fill="rgba(0,0,0,.06)"></path>
+            ${parts.join("")}
+            <path d="${outline}" fill="none" stroke="rgba(0,0,0,.22)" stroke-width="1"></path>
+          </g>
+        `;
+      }
+
+      function dialHTML({ left, right, showTarget, target, showGuess, guess }){
+        const t = target ?? 50;
+        const g = guess ?? 50;
+        const halfDisc = `M 40 200 A 160 160 0 0 1 360 200 L 200 200 Z`;
+
+        return `
+          <div class="dial">
+            <div class="dialInner">
+              <svg class="dialSvg" viewBox="0 0 400 250" aria-label="Dial Wavelength" role="img">
+                <defs>
+                  <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="rgba(0,0,0,.25)"/>
+                  </filter>
+                </defs>
+
+                <g filter="url(#softShadow)">
+                  <path d="${halfDisc}" fill="var(--dialFace)" stroke="var(--dialFaceEdge)" stroke-width="2"></path>
+                </g>
+
+                ${
+                  Array.from({length: 21}, (_,i)=>{
+                    const v = i*5;
+                    const rad = valueToRad(v);
+                    const r1 = 154;
+                    const r2 = (i%5===0) ? 138 : 146;
+                    const p1 = polarPoint(200, 200, r1, rad);
+                    const p2 = polarPoint(200, 200, r2, rad);
+                    const sw = (i%5===0) ? 2.2 : 1.2;
+                    const op = (i%5===0) ? .16 : .10;
+                    return `<line x1="${p1.x.toFixed(2)}" y1="${p1.y.toFixed(2)}" x2="${p2.x.toFixed(2)}" y2="${p2.y.toFixed(2)}" stroke="rgba(0,0,0,${op})" stroke-width="${sw}" />`;
+                  }).join("")
+                }
+
+                ${showTarget ? scoringFanSVG(t) : ""}
+
+                ${showGuess ? `
+                  <g filter="url(#softShadow)">
+                    ${needleLineSVG(g, 200, 52, "var(--dialNeedle)", 7, 0.95)}
+                    ${needleLineSVG(g, 200, 58, "var(--dialNeedle2)", 3, 0.55)}
+                  </g>
+                ` : ""}
+
+                <g filter="url(#softShadow)">
+                  <circle cx="200" cy="200" r="58" fill="var(--dialCenter)"></circle>
+                  <circle cx="200" cy="200" r="58" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="2"></circle>
+                  <circle cx="200" cy="200" r="20" fill="rgba(255,255,255,.12)"></circle>
+                </g>
+              </svg>
+
+              <div class="dialLabels" aria-hidden="true">
+                <div class="side">${escapeHtml(left)}</div>
+                <div class="mid">${showTarget ? `Obj: ${t}` : `0–100`}</div>
+                <div class="side" style="text-align:right;">${escapeHtml(right)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      /* ===== State machine ===== */
+      const STATES = Object.freeze({
+        SETUP: "SETUP",
+        CARD: "CARD",
+        PSYCHIC: "PSYCHIC",
+        TEAM_GUESS: "TEAM_GUESS",
+        OPPONENT_BET: "OPPONENT_BET",
+        REVEAL: "REVEAL",
+        GAME_OVER: "GAME_OVER",
+      });
+
+      const store = {
+        state: STATES.SETUP,
+        goal: DEFAULT_GOAL,
+        teams: [
+          { name: "Equipo A", score: START_SCORES[0], psychicNum: 1, turns: 0 },
+          { name: "Equipo B", score: START_SCORES[1], psychicNum: 1, turns: 0 }
+        ],
+        activeTeam: 0,
+        suddenDeath: false,
+
+        deck: [],
+        card: null,
+        clue: "",
+        target: null,
+        guess: 50,
+        opponentBet: null, // "LEFT" | "RIGHT"
+        lastResult: null,
+        history: [],
+
+        passQueue: null // {title,text}
+      };
+
+      function buildDeck(){
+        store.deck = Array.from({length: CARDS.length}, (_,i)=>i);
+        for (let i=store.deck.length-1;i>0;i--){
+          const j = Math.floor(Math.random()*(i+1));
+          [store.deck[i], store.deck[j]] = [store.deck[j], store.deck[i]];
+        }
+      }
+
+      function drawCard(){
+        if (store.deck.length === 0) buildDeck();
+        return CARDS[store.deck.pop()];
+      }
+
+      function resetTurn(){
+        store.card = drawCard();
+        store.clue = "";
+        store.target = null;
+        store.guess = 50;
+        store.opponentBet = null;
+        store.lastResult = null;
+      }
+
+      /* ===== UI wiring ===== */
+      const els = {
+        main: $("#mainArea"),
+        phaseTitle: $("#phaseTitle"),
+        phaseSubtitle: $("#phaseSubtitle"),
+        pillTurn: $("#pillTurn"),
+        pillGoal: $("#pillGoal"),
+        scoreSubtitle: $("#scoreSubtitle"),
+
+        aName: $("#aName"),
+        bName: $("#bName"),
+        aScore: $("#aScore"),
+        bScore: $("#bScore"),
+        aPsychic: $("#aPsychic"),
+        bPsychic: $("#bPsychic"),
+        aTurns: $("#aTurns"),
+        bTurns: $("#bTurns"),
+
+        hist: $("#hist"),
+
+        btnRules: $("#btnRules"),
+        modalRules: $("#modalRules"),
+        btnCloseRules: $("#btnCloseRules"),
+
+        btnFullscreen: $("#btnFullscreen"),
+        btnReset: $("#btnReset"),
+        btnPass: $("#btnPass"),
+
+        btnNextPA: $("#btnNextPA"),
+        btnNextPB: $("#btnNextPB"),
+
+        toast: $("#toast"),
+
+        passOverlay: $("#passOverlay"),
+        passTitle: $("#passTitle"),
+        passText: $("#passText"),
+        passHint: $("#passHint"),
+        btnPassContinue: $("#btnPassContinue"),
+      };
+
+      function showToast(msg, ms=2400){
+        els.toast.textContent = msg;
+        els.toast.classList.add("show");
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(() => els.toast.classList.remove("show"), ms);
+      }
+
+      function openModal(m){ m.classList.add("show"); m.querySelector("button")?.focus(); }
+      function closeModal(m){ m.classList.remove("show"); }
+
+      function setPhase(title, subtitle){
+        els.phaseTitle.textContent = title;
+        els.phaseSubtitle.textContent = subtitle;
+      }
+
+      function teamLabel(i){ return store.teams[i].name; }
+
+      function activeTurnLabel(){
+        const t = store.activeTeam;
+        return `${teamLabel(t)} (Psíquico #${store.teams[t].psychicNum})`;
+      }
+
+      function renderSidebar(){
+        els.pillGoal.innerHTML = `<strong>Objetivo:</strong> ${store.goal}`;
+        els.scoreSubtitle.textContent = store.suddenDeath ? `Sudden death — desempate` : `Primero a ${store.goal} puntos`;
+
+        els.aName.textContent = store.teams[0].name;
+        els.bName.textContent = store.teams[1].name;
+        els.aScore.textContent = store.teams[0].score;
+        els.bScore.textContent = store.teams[1].score;
+        els.aPsychic.textContent = store.teams[0].psychicNum;
+        els.bPsychic.textContent = store.teams[1].psychicNum;
+        els.aTurns.textContent = store.teams[0].turns;
+        els.bTurns.textContent = store.teams[1].turns;
+
+        const turnText = (store.state === STATES.SETUP || store.state === STATES.GAME_OVER)
+          ? "—"
+          : activeTurnLabel();
+        els.pillTurn.innerHTML = `<strong>Turno:</strong> ${escapeHtml(turnText)}`;
+
+        // History
+        const items = store.history.slice(0,5);
+        els.hist.innerHTML = items.length ? items.map(h => `
+          <div class="hitem">
+            <div class="hrow">
+              <div><b>${escapeHtml(h.team)}</b> · <span>${escapeHtml(h.card)}</span></div>
+              <div class="mono">+${h.teamPts}${h.steal ? ` / +${h.stealPts} robo` : ""}</div>
+            </div>
+            <div class="hrow" style="margin-top:6px;">
+              <div class="mono">Obj ${h.target} · Pos ${h.guess}</div>
+              <div>${h.bet ? `Rival: <b>${h.bet}</b> (${h.betOk ? "acierta" : "falla"})` : "Rival: —"}</div>
+            </div>
+          </div>
+        `).join("") : `<div class="hitem">Aún no hay rondas.</div>`;
+      }
+
+      function queuePass(title, text){
+        store.passQueue = { title, text };
+        els.passTitle.textContent = title;
+        els.passText.textContent = text;
+        els.passOverlay.classList.add("show");
+        els.btnPassContinue.focus();
+      }
+
+      function clearPass(){
+        store.passQueue = null;
+        els.passOverlay.classList.remove("show");
+      }
+
+      /* ===== Gameplay transitions ===== */
+      function nextPsychic(teamIdx){
+        store.teams[teamIdx].psychicNum += 1;
+      }
+
+      function setActiveTeam(teamIdx){
+        store.activeTeam = teamIdx;
+      }
+
+      function otherTeam(teamIdx){ return 1 - teamIdx; }
+
+      function pushHistory(entry){
+        store.history.unshift(entry);
+        if (store.history.length > 20) store.history.length = 20;
+      }
+
+      function resolveTurn(){
+        const t = store.activeTeam;
+        const o = otherTeam(t);
+
+        const { teamPoints } = scoreGuess(store.target, store.guess);
+
+        // Determine steal condition
+        let stealPts = 0;
+        let betOk = false;
+
+        const truth = leftRightBet(store.target, store.guess); // LEFT / RIGHT / EITHER
+        if (store.opponentBet){
+          betOk = (truth === "EITHER") ? true : (store.opponentBet === truth);
+          if (betOk && teamPoints !== 4) stealPts = 1;
+        }
+
+        // Apply scores
+        store.teams[t].score += teamPoints;
+        if (stealPts) store.teams[o].score += stealPts;
+
+        // Record
+        pushHistory({
+          team: store.teams[t].name,
+          card: `${store.card.left} — ${store.card.right}`,
+          target: store.target,
+          guess: store.guess,
+          teamPts: teamPoints,
+          steal: stealPts ? true : false,
+          stealPts,
+          bet: store.opponentBet,
+          betOk
+        });
+
+        // Determine end/catch-up
+        const scores = [store.teams[0].score, store.teams[1].score];
+
+        // Sudden death mode if tie at/above goal
+        if (isTieAtGoalOrAbove(scores, store.goal)) store.suddenDeath = true;
+
+        if (store.suddenDeath){
+          // In sudden death, just keep playing until not tied (no special rule beyond normal flow).
+          if (hasWinner(scores, store.goal)) {
+            store.state = STATES.GAME_OVER;
+            return;
+          }
+        } else {
+          if (hasWinner(scores, store.goal)) {
+            store.state = STATES.GAME_OVER;
+            return;
+          }
+        }
+
+        // Catch-up rule
+        const needExtra = applyCatchUpRule(scores, t, teamPoints);
+        if (needExtra){
+          // same team plays again, next psychic
+          nextPsychic(t);
+          resetTurn();
+          store.state = STATES.CARD;
+          queuePass("Catch-up: misma equipo repite", `${store.teams[t].name} ha hecho 4 puntos pero sigue perdiendo. Juega otra ronda. Solo el nuevo Psíquico mira el objetivo.`);
+          return;
+        }
+
+        // Normal: switch active team, next psychic for the new active team (manual rotation button also available)
+        setActiveTeam(o);
+        nextPsychic(o);
+        resetTurn();
+        store.state = STATES.CARD;
+        queuePass("Cambiar de equipo", `Turno para ${store.teams[o].name}. Solo su Psíquico debe mirar el objetivo en la fase Psíquico.`);
+      }
+
+      /* ===== Render per state ===== */
+      function render(){
+        renderSidebar();
+
+        const t = store.activeTeam;
+        const o = otherTeam(t);
+
+        if (store.state === STATES.SETUP){
+          setPhase("Configurar partida", "Define equipos, objetivo y empieza.");
+          els.main.innerHTML = `
+            <div class="col" style="gap:14px;">
+              <div class="row">
+                <div class="grow">
+                  <label for="inpA">Nombre Equipo A</label>
+                  <input id="inpA" class="input" value="${escapeHtml(store.teams[0].name)}" />
+                </div>
+                <div class="grow">
+                  <label for="inpB">Nombre Equipo B</label>
+                  <input id="inpB" class="input" value="${escapeHtml(store.teams[1].name)}" />
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="grow">
+                  <label for="inpGoal">Puntos objetivo</label>
+                  <input id="inpGoal" class="input" inputmode="numeric" value="${store.goal}" />
+                </div>
+                <div class="grow">
+                  <label>Handicap inicial</label>
+                  <div class="notice">Equipo A empieza con <b>${START_SCORES[0]}</b> y Equipo B con <b>${START_SCORES[1]}</b>.</div>
+                </div>
+              </div>
+
+              ${dialHTML({
+                left:"Extremo izquierdo",
+                right:"Extremo derecho",
+                showTarget:false,
+                target:null,
+                showGuess:true,
+                guess: 50
+              })}
+
+              <div class="notice">
+                <b>Importante:</b> el objetivo secreto solo se renderiza en la fase <b>Psíquico</b> y en <b>Revelación</b>.
+              </div>
+
+              <div class="row" style="justify-content:space-between;">
+                <span class="pill"><strong>Cartas:</strong> ${CARDS.length}</span>
+                <button class="btn primary" id="btnStart">Empezar</button>
+              </div>
+            </div>
+          `;
+
+          $("#inpA").addEventListener("input", (e)=>{ store.teams[0].name = (e.target.value||"").trim() || "Equipo A"; renderSidebar(); });
+          $("#inpB").addEventListener("input", (e)=>{ store.teams[1].name = (e.target.value||"").trim() || "Equipo B"; renderSidebar(); });
+
+          $("#inpGoal").addEventListener("input", (e)=>{
+            const v = parseInt(String(e.target.value||"").replace(/[^\d]/g,""), 10);
+            store.goal = clamp(Number.isFinite(v)?v:DEFAULT_GOAL, 1, 999);
+            renderSidebar();
+          });
+
+          $("#btnStart").addEventListener("click", () => {
+            store.goal = clamp(store.goal, 1, 999);
+
+            store.teams[0].score = START_SCORES[0];
+            store.teams[1].score = START_SCORES[1];
+            store.teams[0].psychicNum = 1;
+            store.teams[1].psychicNum = 1;
+            store.teams[0].turns = 0;
+            store.teams[1].turns = 0;
+            store.history = [];
+            store.suddenDeath = false;
+
+            buildDeck();
+            setActiveTeam(0);
+            resetTurn();
+            store.state = STATES.CARD;
+
+            queuePass("Inicio", `Empieza ${store.teams[0].name}. Solo su Psíquico mira el objetivo en la fase Psíquico.`);
+            render();
+          });
+          return;
+        }
+
+        if (store.state === STATES.CARD){
+          setPhase("Carta", `${store.teams[t].name} activo. Se muestran extremos a todos. Luego: Psíquico.`);
+          els.main.innerHTML = `
+            <div class="col" style="gap:14px;">
+              <div class="row" style="justify-content:space-between; align-items:flex-start;">
+                <div class="col" style="gap:6px;">
+                  <b style="font-size:14px;">Carta</b>
+                  <span class="pill"><strong>${escapeHtml(store.card.left)}</strong> — <strong>${escapeHtml(store.card.right)}</strong></span>
+                </div>
+                <div class="row">
+                  <button class="btn" id="btnNewCard">Otra carta</button>
+                </div>
+              </div>
+
+              ${dialHTML({
+                left: store.card.left,
+                right: store.card.right,
+                showTarget:false,
+                target:null,
+                showGuess:true,
+                guess: 50
+              })}
+
+              <div class="row">
+                <div class="grow">
+                  <label for="inpClue">Pista (opcional, para historial)</label>
+                  <input id="inpClue" class="input" value="${escapeHtml(store.clue)}" placeholder="Ej: “lunes por la mañana”…"/>
+                </div>
+              </div>
+
+              <div class="notice">
+                Siguiente: fase <b>Psíquico</b> (solo mira el Psíquico del equipo activo).
+              </div>
+
+              <div class="row" style="justify-content:space-between;">
+                <button class="btn" id="btnPassToPsychic">Pasar dispositivo</button>
+                <button class="btn primary" id="btnGoPsychic">Ir a Psíquico</button>
+              </div>
+            </div>
+          `;
+
+          $("#inpClue").addEventListener("input", (e)=>{ store.clue = (e.target.value||"").trim().slice(0, 140); });
+          $("#btnNewCard").addEventListener("click", () => { store.card = drawCard(); store.clue=""; render(); });
+          $("#btnPassToPsychic").addEventListener("click", () => {
+            queuePass("Solo Psíquico", `Ahora mira el Psíquico de ${store.teams[t].name}. Objetivo secreto.`);
+          });
+          $("#btnGoPsychic").addEventListener("click", () => {
+            store.target = randomTarget(); // aleatorio siempre
+            store.state = STATES.PSYCHIC;
+            queuePass("Solo Psíquico", `Objetivo generado. Solo el Psíquico de ${store.teams[t].name} debe mirar ahora.`);
+            render();
+          });
+          return;
+        }
+
+        if (store.state === STATES.PSYCHIC){
+          setPhase("Psíquico (secreto)", `${store.teams[t].name}: el Psíquico ve objetivo y da la pista. Luego oculta y pasa al equipo.`);
+          els.main.innerHTML = `
+            <div class="col" style="gap:14px;">
+              <div class="notice">
+                <b>Solo el Psíquico</b>. No uses números. Da una pista para orientar la aguja.
+              </div>
+
+              ${dialHTML({
+                left: store.card.left,
+                right: store.card.right,
+                showTarget:true,
+                target: store.target,
+                showGuess:false,
+                guess: store.guess
+              })}
+
+              <div class="row">
+                <div class="grow">
+                  <label for="inpClue2">Pista (opcional, para registrarla)</label>
+                  <input id="inpClue2" class="input" value="${escapeHtml(store.clue)}" placeholder="(Opcional) escribe la pista"/>
+                </div>
+              </div>
+
+              <div class="row" style="justify-content:space-between;">
+                <button class="btn" id="btnBackCard">Volver (Carta)</button>
+                <button class="btn primary" id="btnHideToTeam">Ocultar objetivo / Pasar al equipo</button>
+              </div>
+            </div>
+          `;
+
+          $("#inpClue2").addEventListener("input", (e)=>{ store.clue = (e.target.value||"").trim().slice(0, 140); });
+
+          $("#btnBackCard").addEventListener("click", () => {
+            if (!confirm("¿Volver a Carta? Se regenerará el objetivo al volver a Psíquico.")) return;
+            store.target = null;
+            store.state = STATES.CARD;
+            render();
+          });
+
+          $("#btnHideToTeam").addEventListener("click", () => {
+            store.state = STATES.TEAM_GUESS;
+            queuePass("Equipo activo adivina", `Ahora adivina ${store.teams[t].name}. El objetivo NO debe verse.`);
+            render();
+          });
+          return;
+        }
+
+        if (store.state === STATES.TEAM_GUESS){
+          setPhase("Equipo (adivinar)", `${store.teams[t].name}: ajusta aguja y bloquea. Objetivo oculto.`);
+          els.main.innerHTML = `
+            <div class="col" style="gap:14px;">
+              <div class="notice">Objetivo oculto. Ajusta la posición (0–100). Luego bloquea.</div>
+
+              ${dialHTML({
+                left: store.card.left,
+                right: store.card.right,
+                showTarget:false,
+                target:null,
+                showGuess:true,
+                guess: store.guess
+              })}
+
+              <div class="sliderRow">
+                <label for="rngGuess">Posición (0–100)</label>
+                <input id="rngGuess" type="range" min="0" max="100" value="${store.guess}" aria-label="Selector de posición"/>
+                <div class="numRow">
+                  <span>0</span>
+                  <span>Actual: <b id="gVal">${store.guess}</b></span>
+                  <span>100</span>
+                </div>
+              </div>
+
+              <div class="row" style="justify-content:space-between;">
+                <button class="btn" id="btnBackPsychic">Volver (Psíquico)</button>
+                <button class="btn primary" id="btnLock">Bloquear respuesta</button>
+              </div>
+            </div>
+          `;
+
+          const rng = $("#rngGuess");
+          const gVal = $("#gVal");
+          rng.addEventListener("input", () => {
+            store.guess = clamp(parseInt(rng.value,10), 0, 100);
+            gVal.textContent = store.guess;
+            // re-render dial live without leaking target
+            render();
+            store.state = STATES.TEAM_GUESS;
+          });
+
+          $("#btnBackPsychic").addEventListener("click", () => {
+            if (!confirm("¿Volver a Psíquico? Asegúrate de que solo el Psíquico mire.")) return;
+            store.state = STATES.PSYCHIC;
+            queuePass("Solo Psíquico", `Solo el Psíquico de ${store.teams[t].name} debe mirar el objetivo.`);
+            render();
+          });
+
+          $("#btnLock").addEventListener("click", () => {
+            if (!confirm(`¿Bloquear posición ${store.guess}?`)) return;
+            store.state = STATES.OPPONENT_BET;
+            queuePass("Rival apuesta", `Ahora apuesta ${store.teams[o].name}: LEFT o RIGHT (¿objetivo a la izquierda o a la derecha de la aguja?).`);
+            render();
+          });
+          return;
+        }
+
+        if (store.state === STATES.OPPONENT_BET){
+          setPhase("Rival (apuesta)", `${store.teams[o].name}: apuesta LEFT/RIGHT. El objetivo sigue oculto.`);
+          els.main.innerHTML = `
+            <div class="col" style="gap:14px;">
+              <div class="notice">
+                Apuesta si el objetivo está a la <b>izquierda</b> o a la <b>derecha</b> de la aguja del equipo rival.
+                Si aciertas, robas <b>+1</b> (salvo que el rival haga <b>4</b> puntos).
+              </div>
+
+              ${dialHTML({
+                left: store.card.left,
+                right: store.card.right,
+                showTarget:false,
+                target:null,
+                showGuess:true,
+                guess: store.guess
+              })}
+
+              <div class="row" style="justify-content:center; gap:12px;">
+                <button class="btn alt" id="btnLeft" aria-label="Apuesta izquierda">LEFT</button>
+                <button class="btn alt" id="btnRight" aria-label="Apuesta derecha">RIGHT</button>
+              </div>
+
+              <div class="row" style="justify-content:space-between;">
+                <button class="btn" id="btnBackGuess">Volver (Equipo)</button>
+                <button class="btn primary" id="btnReveal" disabled>Revelar</button>
+              </div>
+            </div>
+          `;
+
+          const btnReveal = $("#btnReveal");
+
+          function setBet(bet){
+            store.opponentBet = bet;
+            $("#btnLeft").classList.toggle("primary", bet==="LEFT");
+            $("#btnRight").classList.toggle("primary", bet==="RIGHT");
+            btnReveal.disabled = false;
+          }
+
+          $("#btnLeft").addEventListener("click", () => setBet("LEFT"));
+          $("#btnRight").addEventListener("click", () => setBet("RIGHT"));
+
+          $("#btnBackGuess").addEventListener("click", () => {
+            store.opponentBet = null;
+            store.state = STATES.TEAM_GUESS;
+            queuePass("Equipo activo adivina", `Vuelve a adivinar ${store.teams[t].name}. Objetivo oculto.`);
+            render();
+          });
+
+          btnReveal.addEventListener("click", () => {
+            if (!confirm("¿Revelar objetivo y puntuar?")) return;
+            store.state = STATES.REVEAL;
+            render();
+          });
+          return;
+        }
+
+        if (store.state === STATES.REVEAL){
+          // compute result for display only (scoring applied on Next)
+          const { teamPoints } = scoreGuess(store.target, store.guess);
+          const truth = leftRightBet(store.target, store.guess);
+          const betOk = store.opponentBet ? (truth==="EITHER" ? true : store.opponentBet===truth) : false;
+          const stealPts = (store.opponentBet && betOk && teamPoints !== 4) ? 1 : 0;
+
+          setPhase("Revelación", `Obj: ${store.target} · Pos: ${store.guess} · +${teamPoints} ${store.teams[t].name}${stealPts?` · Rival +${stealPts}`:""}`);
+
+          els.main.innerHTML = `
+            <div class="col" style="gap:14px;">
+              ${dialHTML({
+                left: store.card.left,
+                right: store.card.right,
+                showTarget:true,
+                target: store.target,
+                showGuess:true,
+                guess: store.guess
+              })}
+
+              <div class="row">
+                <span class="pill"><strong>Objetivo:</strong> <span class="mono">${store.target}</span></span>
+                <span class="pill"><strong>Posición:</strong> <span class="mono">${store.guess}</span></span>
+                <span class="pill"><strong>Puntos:</strong> +<span class="mono">${teamPoints}</span></span>
+                <span class="pill"><strong>Robo:</strong> ${store.opponentBet ? `<span class="mono">${store.opponentBet}</span> (${betOk?"acierta":"falla"})${stealPts?` · +${stealPts}`:""}` : "—"}</span>
+              </div>
+
+              <div class="notice">
+                <b>Equipo activo:</b> ${escapeHtml(store.teams[t].name)}<br/>
+                <b>Carta:</b> ${escapeHtml(store.card.left)} — ${escapeHtml(store.card.right)}<br/>
+                <b>Pista:</b> ${escapeHtml(store.clue || "—")}
+              </div>
+
+              <div class="row" style="justify-content:space-between;">
+                <button class="btn" id="btnBackBet">Volver (Rival)</button>
+                <button class="btn primary" id="btnApply">Aplicar puntos / Siguiente</button>
+              </div>
+            </div>
+          `;
+
+          $("#btnBackBet").addEventListener("click", () => {
+            if (!confirm("¿Volver a la apuesta del rival?")) return;
+            store.state = STATES.OPPONENT_BET;
+            queuePass("Rival apuesta", `Apuesta ${store.teams[o].name}.`);
+            render();
+          });
+
+          $("#btnApply").addEventListener("click", () => {
+            store.teams[t].turns += 1;
+            resolveTurn();
+            render();
+          });
+          return;
+        }
+
+        if (store.state === STATES.GAME_OVER){
+          const scores = [store.teams[0].score, store.teams[1].score];
+          const w = winnerIndex(scores);
+          const winner = (w===null) ? "Empate" : store.teams[w].name;
+
+          setPhase("Fin de partida", w===null ? "Empate." : `Ganador: ${winner}`);
+          els.main.innerHTML = `
+            <div class="col" style="gap:14px;">
+              <div class="notice">
+                <b style="font-size:14px;">Resultado</b><br/>
+                <div style="margin-top:10px" class="row">
+                  <span class="pill"><strong>${escapeHtml(store.teams[0].name)}:</strong> <span class="mono">${scores[0]}</span></span>
+                  <span class="pill"><strong>${escapeHtml(store.teams[1].name)}:</strong> <span class="mono">${scores[1]}</span></span>
+                  <span class="pill"><strong>Modo:</strong> ${store.suddenDeath ? "Sudden death" : "Normal"}</span>
+                </div>
+              </div>
+
+              ${dialHTML({ left:"—", right:"—", showTarget:false, target:null, showGuess:true, guess: 50 })}
+
+              <div class="row" style="justify-content:center; gap:10px;">
+                <button class="btn primary" id="btnPlayAgain">Jugar otra vez</button>
+                <button class="btn" id="btnBackSetup">Volver a setup</button>
+              </div>
+            </div>
+          `;
+
+          $("#btnPlayAgain").addEventListener("click", () => {
+            store.teams[0].score = START_SCORES[0];
+            store.teams[1].score = START_SCORES[1];
+            store.teams[0].psychicNum = 1;
+            store.teams[1].psychicNum = 1;
+            store.teams[0].turns = 0;
+            store.teams[1].turns = 0;
+            store.history = [];
+            store.suddenDeath = false;
+
+            buildDeck();
+            setActiveTeam(0);
+            resetTurn();
+            store.state = STATES.CARD;
+            queuePass("Nueva partida", `Empieza ${store.teams[0].name}. Solo su Psíquico mira el objetivo.`);
+            render();
+          });
+
+          $("#btnBackSetup").addEventListener("click", () => {
+            store.state = STATES.SETUP;
+            render();
+          });
+          return;
+        }
+      }
+
+      /* ===== Buttons & global controls ===== */
+      els.btnRules.addEventListener("click", () => openModal(els.modalRules));
+      els.btnCloseRules.addEventListener("click", () => closeModal(els.modalRules));
+      els.modalRules.addEventListener("click", (e)=>{ if (e.target === els.modalRules) closeModal(els.modalRules); });
+      window.addEventListener("keydown", (e)=>{ if (e.key === "Escape") { closeModal(els.modalRules); clearPass(); } });
+
+      els.btnFullscreen.addEventListener("click", async () => {
+        try{
+          if (!document.fullscreenElement){
+            await document.documentElement.requestFullscreen();
+            showToast("Pantalla completa.");
+          } else {
+            await document.exitFullscreen();
+            showToast("Salir de pantalla completa.");
+          }
+        } catch {
+          showToast("Pantalla completa no disponible.");
+        }
+      });
+
+      els.btnReset.addEventListener("click", () => {
+        if (!confirm("¿Reset total? Vuelve al setup.")) return;
+        store.state = STATES.SETUP;
+        store.goal = DEFAULT_GOAL;
+        store.teams[0].name = "Equipo A";
+        store.teams[1].name = "Equipo B";
+        store.teams[0].score = START_SCORES[0];
+        store.teams[1].score = START_SCORES[1];
+        store.teams[0].psychicNum = 1;
+        store.teams[1].psychicNum = 1;
+        store.teams[0].turns = 0;
+        store.teams[1].turns = 0;
+        store.history = [];
+        store.suddenDeath = false;
+        store.deck = [];
+        store.card = null;
+        store.clue = "";
+        store.target = null;
+        store.guess = 50;
+        store.opponentBet = null;
+        store.passQueue = null;
+        clearPass();
+        showToast("Reset completado.");
+        render();
+      });
+
+      els.btnPass.addEventListener("click", () => {
+        const msg =
+          store.state === STATES.PSYCHIC ? `Solo Psíquico de ${teamLabel(store.activeTeam)}.` :
+          store.state === STATES.TEAM_GUESS ? `Adivina ${teamLabel(store.activeTeam)} (objetivo oculto).` :
+          store.state === STATES.OPPONENT_BET ? `Apuesta ${teamLabel(otherTeam(store.activeTeam))} (objetivo oculto).` :
+          store.state === STATES.REVEAL ? `Revelación: puede mirar todo el mundo.` :
+          store.state === STATES.CARD ? `Carta: puede mirar todo el mundo.` :
+          `Listo.`;
+        queuePass("Pasar dispositivo", msg);
+      });
+
+      els.btnPassContinue.addEventListener("click", () => clearPass());
+
+      // Manual psychic rotation controls (as requested)
+      els.btnNextPA.addEventListener("click", () => { store.teams[0].psychicNum += 1; renderSidebar(); showToast("Equipo A: siguiente psíquico."); });
+      els.btnNextPB.addEventListener("click", () => { store.teams[1].psychicNum += 1; renderSidebar(); showToast("Equipo B: siguiente psíquico."); });
+
+      /* ===== Self-tests (quick sanity) ===== */
+      function runSelfTests(){
+        const cases = [
+          {t:50,g:50,pts:4},
+          {t:50,g:53,pts:4},
+          {t:50,g:54,pts:3},
+          {t:50,g:56,pts:3},
+          {t:50,g:57,pts:2},
+          {t:50,g:60,pts:2},
+          {t:50,g:61,pts:0},
+        ];
+        for (const c of cases){
+          const r = scoreGuess(c.t,c.g);
+          if (r.teamPoints !== c.pts) throw new Error(`SelfTest fail scoreGuess t=${c.t} g=${c.g}: got ${r.teamPoints} expected ${c.pts}`);
+        }
+        const lr1 = leftRightBet(40,60); if (lr1!=="LEFT") throw new Error("SelfTest fail LEFT");
+        const lr2 = leftRightBet(80,60); if (lr2!=="RIGHT") throw new Error("SelfTest fail RIGHT");
+        const lr3 = leftRightBet(60,60); if (lr3!=="EITHER") throw new Error("SelfTest fail EITHER");
+        return true;
+      }
+      try{ runSelfTests(); } catch(e){ console.error(e); showToast("Error interno en tests. Revisa consola.", 4500); }
+
+      /* ===== Boot ===== */
+      render();
+    })();
+  </script>
+</body>
+</html>
