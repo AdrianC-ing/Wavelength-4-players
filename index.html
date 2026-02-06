@@ -21,7 +21,6 @@
       --a: #7dd3fc;
       --b: #a78bfa;
 
-      /* Dial (physical-ish) */
       --dialFace: #efe9dc;
       --dialFaceEdge: rgba(0,0,0,.08);
       --dialWindow2: #ffb44d;
@@ -479,7 +478,7 @@
                   <span class="dot b" aria-hidden="true"></span>
                   <div class="tname" id="bName">Equipo B</div>
                 </div>
-                <div class="tscore mono" id="bScore">1</div>
+                <div class="tscore mono" id="bScore">0</div>
               </div>
               <div class="meta">
                 <span class="ps">Psíquico: <b id="bPsychic">1</b> <button class="btn small" id="btnNextPB">Siguiente Psíquico</button></span>
@@ -496,7 +495,7 @@
             </div>
 
             <div class="notice">
-              Rival roba <b>+1</b> si acierta LEFT/RIGHT, <b>siempre</b> (independiente de los puntos del equipo activo).
+              Rival roba <b>+1</b> si acierta LEFT/RIGHT, <b>siempre</b>.
             </div>
 
             <div class="hr"></div>
@@ -522,29 +521,18 @@
         <h3>Setup</h3>
         <ul>
           <li>Objetivo: <b>10</b> puntos (editable).</li>
-          <li>Handicap inicial: <b>Equipo A = 0</b>, <b>Equipo B = 1</b>.</li>
-          <li>Roles: cada turno un equipo es <b>activo</b>. Su <b>Psíquico</b> ve el objetivo y da la pista. Su equipo <b>adivina</b>. El rival hace apuesta <b>LEFT/RIGHT</b>.</li>
+          <li>Handicap inicial: <b>0–0</b> (sin puntos al abrir).</li>
         </ul>
 
-        <h3>Flujo de turno</h3>
+        <h3>Flujo</h3>
         <ul>
-          <li><b>1) Carta:</b> extremos visibles para todos.</li>
-          <li><b>2) Psíquico (secreto):</b> objetivo aleatorio 0–100 (solo psíquico).</li>
-          <li><b>3) Equipo:</b> ajusta aguja y bloquea.</li>
-          <li><b>4) Rival:</b> apuesta LEFT/RIGHT (objetivo a izquierda/derecha de la aguja).</li>
-          <li><b>5) Revelación:</b> se muestran objetivo y aguja, se puntúa.</li>
+          <li>Carta → Psíquico (secreto) → Equipo (aguja) → Rival (LEFT/RIGHT) → Revelación (puntuación).</li>
         </ul>
 
         <h3>Puntuación</h3>
         <ul>
-          <li>±3: <b>4 puntos</b>, ±6: <b>3 puntos</b>, ±10: <b>2 puntos</b>, fuera: <b>0</b>.</li>
-          <li>El rival gana <b>+1</b> si acierta LEFT/RIGHT <b>siempre</b> (independientemente de lo que puntúe el equipo activo).</li>
-        </ul>
-
-        <h3>Catch-up y fin</h3>
-        <ul>
-          <li>Si el equipo activo obtiene <b>4</b> y aun así va <b>perdiendo</b> tras puntuar, juega otra ronda inmediatamente (mismo equipo, siguiente psíquico).</li>
-          <li>Si alguien llega a <b>10+</b>, termina. Si hay empate, entra en <b>sudden death</b> (rondas hasta desempatar).</li>
+          <li>±3: <b>4</b>, ±6: <b>3</b>, ±10: <b>2</b>, fuera: <b>0</b>.</li>
+          <li>Rival: <b>+1</b> si acierta LEFT/RIGHT, <b>siempre</b>.</li>
         </ul>
       </div>
     </div>
@@ -568,83 +556,36 @@
       "use strict";
 
       const CARDS = [
-        { left:"Frío", right:"Caliente" },
-        { left:"Aburrido", right:"Emocionante" },
-        { left:"Inofensivo", right:"Peligroso" },
-        { left:"Común", right:"Raro" },
-        { left:"Débil", right:"Fuerte" },
-        { left:"Simple", right:"Complejo" },
-        { left:"Tradicional", right:"Innovador" },
-        { left:"Caro", right:"Barato" },
-        { left:"Serio", right:"Cómico" },
-        { left:"Ordenado", right:"Caótico" },
-        { left:"Egoísta", right:"Altruista" },
-        { left:"Lento", right:"Rápido" },
-        { left:"Seguro", right:"Arriesgado" },
-        { left:"Formal", right:"Informal" },
-        { left:"Amigable", right:"Hostil" },
-        { left:"Sutil", right:"Exagerado" },
-        { left:"Fácil", right:"Difícil" },
-        { left:"De mal gusto", right:"Elegante" },
-        { left:"Relajante", right:"Estresante" },
-        { left:"Predecible", right:"Impredecible" },
-        { left:"Infantil", right:"Adulto" },
-        { left:"Moderno", right:"Retro" },
-        { left:"Realista", right:"Fantástico" },
-        { left:"Optimista", right:"Pesimista" },
-        { left:"Honesto", right:"Engañoso" },
-        { left:"Conservador", right:"Rebelde" },
-        { left:"Silencioso", right:"Ruidoso" },
-        { left:"Íntimo", right:"Público" },
-        { left:"Casual", right:"Solemne" },
-        { left:"Suave", right:"Brusco" },
-        { left:"Delicado", right:"Robusto" },
-        { left:"Abstracto", right:"Concreto" },
-        { left:"Limpio", right:"Sucio" },
-        { left:"Natural", right:"Artificial" },
-        { left:"Agradable", right:"Desagradable" },
-        { left:"Racional", right:"Emocional" },
-        { left:"Amable", right:"Cruel" },
-        { left:"Flexible", right:"Rígido" },
-        { left:"Minimalista", right:"Recargado" },
-        { left:"Local", right:"Global" },
-        { left:"Clásico", right:"Vanguardista" },
-        { left:"Tierno", right:"Intimidante" },
-        { left:"Práctico", right:"Impráctico" },
-        { left:"Popular", right:"De nicho" },
-        { left:"Cotidiano", right:"Épico" },
-        { left:"Atemporal", right:"De moda" },
-        { left:"Aire libre", right:"Interior" },
-        { left:"Individual", right:"En equipo" },
-        { left:"Aventurero", right:"Cauteloso" },
-        { left:"Directo", right:"Ambiguo" },
-        { left:"Atractivo", right:"Repulsivo" },
-        { left:"Futurista", right:"Antiguo" },
-        { left:"Eficiente", right:"Ineficiente" },
-        { left:"Duro", right:"Blando" },
-        { left:"Sincero", right:"Diplomático" },
-        { left:"Exclusivo", right:"Inclusivo" },
-        { left:"Intenso", right:"Ligero" },
-        { left:"Frágil", right:"Resistente" },
-        { left:"Estable", right:"Volátil" },
-        { left:"Metódico", right:"Impulsivo" },
-        { left:"Sano", right:"Indulgente" },
-        { left:"Lógico", right:"Intuitivo" },
-        { left:"Pulido", right:"Desaliñado" },
-        { left:"Cercano", right:"Distante" },
-        { left:"Profesional", right:"Amateur" },
-        { left:"Humilde", right:"Presumido" },
-        { left:"Confiable", right:"Inestable" },
-        { left:"Científico", right:"Místico" },
-        { left:"Transparente", right:"Opaco" },
-        { left:"Carismático", right:"Insulso" },
-        { left:"Valiente", right:"Cobarde" },
-        { left:"Curioso", right:"Indiferente" },
+        { left:"Frío", right:"Caliente" },{ left:"Aburrido", right:"Emocionante" },{ left:"Inofensivo", right:"Peligroso" },
+        { left:"Común", right:"Raro" },{ left:"Débil", right:"Fuerte" },{ left:"Simple", right:"Complejo" },
+        { left:"Tradicional", right:"Innovador" },{ left:"Caro", right:"Barato" },{ left:"Serio", right:"Cómico" },
+        { left:"Ordenado", right:"Caótico" },{ left:"Egoísta", right:"Altruista" },{ left:"Lento", right:"Rápido" },
+        { left:"Seguro", right:"Arriesgado" },{ left:"Formal", right:"Informal" },{ left:"Amigable", right:"Hostil" },
+        { left:"Sutil", right:"Exagerado" },{ left:"Fácil", right:"Difícil" },{ left:"De mal gusto", right:"Elegante" },
+        { left:"Relajante", right:"Estresante" },{ left:"Predecible", right:"Impredecible" },{ left:"Infantil", right:"Adulto" },
+        { left:"Moderno", right:"Retro" },{ left:"Realista", right:"Fantástico" },{ left:"Optimista", right:"Pesimista" },
+        { left:"Honesto", right:"Engañoso" },{ left:"Conservador", right:"Rebelde" },{ left:"Silencioso", right:"Ruidoso" },
+        { left:"Íntimo", right:"Público" },{ left:"Casual", right:"Solemne" },{ left:"Suave", right:"Brusco" },
+        { left:"Delicado", right:"Robusto" },{ left:"Abstracto", right:"Concreto" },{ left:"Limpio", right:"Sucio" },
+        { left:"Natural", right:"Artificial" },{ left:"Agradable", right:"Desagradable" },{ left:"Racional", right:"Emocional" },
+        { left:"Amable", right:"Cruel" },{ left:"Flexible", right:"Rígido" },{ left:"Minimalista", right:"Recargado" },
+        { left:"Local", right:"Global" },{ left:"Clásico", right:"Vanguardista" },{ left:"Tierno", right:"Intimidante" },
+        { left:"Práctico", right:"Impráctico" },{ left:"Popular", right:"De nicho" },{ left:"Cotidiano", right:"Épico" },
+        { left:"Atemporal", right:"De moda" },{ left:"Aire libre", right:"Interior" },{ left:"Individual", right:"En equipo" },
+        { left:"Aventurero", right:"Cauteloso" },{ left:"Directo", right:"Ambiguo" },{ left:"Atractivo", right:"Repulsivo" },
+        { left:"Futurista", right:"Antiguo" },{ left:"Eficiente", right:"Ineficiente" },{ left:"Duro", right:"Blando" },
+        { left:"Sincero", right:"Diplomático" },{ left:"Exclusivo", right:"Inclusivo" },{ left:"Intenso", right:"Ligero" },
+        { left:"Frágil", right:"Resistente" },{ left:"Estable", right:"Volátil" },{ left:"Metódico", right:"Impulsivo" },
+        { left:"Sano", right:"Indulgente" },{ left:"Lógico", right:"Intuitivo" },{ left:"Pulido", right:"Desaliñado" },
+        { left:"Cercano", right:"Distante" },{ left:"Profesional", right:"Amateur" },{ left:"Humilde", right:"Presumido" },
+        { left:"Confiable", right:"Inestable" },{ left:"Científico", right:"Místico" },{ left:"Transparente", right:"Opaco" },
+        { left:"Carismático", right:"Insulso" },{ left:"Valiente", right:"Cobarde" },{ left:"Curioso", right:"Indiferente" },
         { left:"Creativo", right:"Convencional" },
       ];
 
       const DEFAULT_GOAL = 10;
-      const START_SCORES = [0, 1];
+      // ✅ FIX: No handicap at page load. Both start at 0.
+      const START_SCORES = [0, 0];
       const WEDGES = { w4: 3, w3: 6, w2: 10 };
 
       const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -733,86 +674,49 @@
       }
 
       function scoringFanSVG(targetVal){
-        const cx=200, cy=200;
         const radPerVal = Math.PI / 100;
         const halfSpan = WEDGES.w2 * radPerVal;
-
         const cRad = valueToRad(targetVal);
 
         let fanStart = cRad + halfSpan;
         let fanEnd   = cRad - halfSpan;
 
-        if (fanStart > Math.PI) {
-          const shift = fanStart - Math.PI;
-          fanStart = Math.PI;
-          fanEnd += shift;
-        }
-        if (fanEnd < 0) {
-          const shift = -fanEnd;
-          fanEnd = 0;
-          fanStart -= shift;
-        }
+        if (fanStart > Math.PI) { const shift = fanStart - Math.PI; fanStart = Math.PI; fanEnd += shift; }
+        if (fanEnd < 0) { const shift = -fanEnd; fanEnd = 0; fanStart -= shift; }
         fanStart = clamp(fanStart, 0, Math.PI);
         fanEnd   = clamp(fanEnd,   0, Math.PI);
 
-        const rOuter = 160;
-        const rInner = 85;
-
+        const rOuter = 160, rInner = 85;
         const totalSpan = Math.abs(fanStart - fanEnd);
         const weights = [1.15, 0.95, 1.05, 0.95, 1.15];
         const wsum = weights.reduce((a,b)=>a+b,0);
         const spans = weights.map(w => totalSpan*(w/wsum));
-
-        const colors = [
-          "var(--dialWindow2)",
-          "var(--dialWindow3)",
-          "var(--dialWindow4)",
-          "var(--dialWindow3)",
-          "var(--dialWindow2)"
-        ];
+        const colors = ["var(--dialWindow2)","var(--dialWindow3)","var(--dialWindow4)","var(--dialWindow3)","var(--dialWindow2)"];
         const labels = ["2","3","4","3","2"];
 
         let cur = fanStart;
         const parts = [];
-
         for (let i=0;i<5;i++){
           const next = cur - spans[i];
-          const s = cur;
-          const e = next;
-
-          const path = donutSectorPath(cx, cy, rOuter, rInner, s, e);
+          const s = cur, e = next;
+          const path = donutSectorPath(200, 200, rOuter, rInner, s, e);
           const mid = (s+e)/2;
-          const p = polarPoint(cx, cy, (rOuter+rInner)/2 + 2, mid);
-
+          const p = polarPoint(200, 200, (rOuter+rInner)/2 + 2, mid);
           parts.push(`
             <path d="${path}" fill="${colors[i]}" opacity="0.95"></path>
-            <text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}"
-                  text-anchor="middle" dominant-baseline="middle"
-                  font-size="14" font-weight="900"
-                  fill="var(--dialTextDark)">
-              ${labels[i]}
-            </text>
+            <text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
+                  font-size="14" font-weight="900" fill="var(--dialTextDark)">${labels[i]}</text>
           `);
-
           cur = next;
         }
-
-        const outline = donutSectorPath(cx, cy, rOuter, rInner, fanStart, fanEnd);
-
-        return `
-          <g>
-            <path d="${outline}" fill="rgba(0,0,0,.06)"></path>
-            ${parts.join("")}
-            <path d="${outline}" fill="none" stroke="rgba(0,0,0,.22)" stroke-width="1"></path>
-          </g>
-        `;
+        const outline = donutSectorPath(200, 200, rOuter, rInner, fanStart, fanEnd);
+        return `<g><path d="${outline}" fill="rgba(0,0,0,.06)"></path>${parts.join("")}<path d="${outline}" fill="none" stroke="rgba(0,0,0,.22)" stroke-width="1"></path></g>`;
       }
 
       function dialHTML({ left, right, showTarget, target, showGuess, guess }){
         const t = target ?? 50;
         const g = guess ?? 50;
         const halfDisc = `M 40 200 A 160 160 0 0 1 360 200 L 200 200 Z`;
-
         return `
           <div class="dial">
             <div class="dialInner">
@@ -895,7 +799,6 @@
         opponentBet: null,
 
         history: [],
-
         passQueue: null
       };
 
@@ -921,42 +824,41 @@
       }
 
       const els = {
-        main: $("#mainArea"),
-        phaseTitle: $("#phaseTitle"),
-        phaseSubtitle: $("#phaseSubtitle"),
-        pillTurn: $("#pillTurn"),
-        pillGoal: $("#pillGoal"),
-        scoreSubtitle: $("#scoreSubtitle"),
+        main: document.querySelector("#mainArea"),
+        phaseTitle: document.querySelector("#phaseTitle"),
+        phaseSubtitle: document.querySelector("#phaseSubtitle"),
+        pillTurn: document.querySelector("#pillTurn"),
+        pillGoal: document.querySelector("#pillGoal"),
+        scoreSubtitle: document.querySelector("#scoreSubtitle"),
 
-        aName: $("#aName"),
-        bName: $("#bName"),
-        aScore: $("#aScore"),
-        bScore: $("#bScore"),
-        aPsychic: $("#aPsychic"),
-        bPsychic: $("#bPsychic"),
-        aTurns: $("#aTurns"),
-        bTurns: $("#bTurns"),
+        aName: document.querySelector("#aName"),
+        bName: document.querySelector("#bName"),
+        aScore: document.querySelector("#aScore"),
+        bScore: document.querySelector("#bScore"),
+        aPsychic: document.querySelector("#aPsychic"),
+        bPsychic: document.querySelector("#bPsychic"),
+        aTurns: document.querySelector("#aTurns"),
+        bTurns: document.querySelector("#bTurns"),
 
-        hist: $("#hist"),
+        hist: document.querySelector("#hist"),
 
-        btnRules: $("#btnRules"),
-        modalRules: $("#modalRules"),
-        btnCloseRules: $("#btnCloseRules"),
+        btnRules: document.querySelector("#btnRules"),
+        modalRules: document.querySelector("#modalRules"),
+        btnCloseRules: document.querySelector("#btnCloseRules"),
 
-        btnFullscreen: $("#btnFullscreen"),
-        btnReset: $("#btnReset"),
-        btnPass: $("#btnPass"),
+        btnFullscreen: document.querySelector("#btnFullscreen"),
+        btnReset: document.querySelector("#btnReset"),
+        btnPass: document.querySelector("#btnPass"),
 
-        btnNextPA: $("#btnNextPA"),
-        btnNextPB: $("#btnNextPB"),
+        btnNextPA: document.querySelector("#btnNextPA"),
+        btnNextPB: document.querySelector("#btnNextPB"),
 
-        toast: $("#toast"),
+        toast: document.querySelector("#toast"),
 
-        passOverlay: $("#passOverlay"),
-        passTitle: $("#passTitle"),
-        passText: $("#passText"),
-        passHint: $("#passHint"),
-        btnPassContinue: $("#btnPassContinue"),
+        passOverlay: document.querySelector("#passOverlay"),
+        passTitle: document.querySelector("#passTitle"),
+        passText: document.querySelector("#passText"),
+        btnPassContinue: document.querySelector("#btnPassContinue"),
       };
 
       function showToast(msg, ms=2400){
@@ -1041,7 +943,6 @@
         if (store.history.length > 20) store.history.length = 20;
       }
 
-      // ✅ FIX: Rival always scores +1 on correct bet (no exception).
       function resolveTurn(){
         const t = store.activeTeam;
         const o = otherTeam(t);
@@ -1051,10 +952,10 @@
         let stealPts = 0;
         let betOk = false;
 
-        const truth = leftRightBet(store.target, store.guess); // LEFT / RIGHT / EITHER
+        const truth = leftRightBet(store.target, store.guess);
         if (store.opponentBet){
           betOk = (truth === "EITHER") ? true : (store.opponentBet === truth);
-          if (betOk) stealPts = 1; // ALWAYS if correct
+          if (betOk) stealPts = 1;
         }
 
         store.teams[t].score += teamPoints;
@@ -1077,15 +978,9 @@
         if (isTieAtGoalOrAbove(scores, store.goal)) store.suddenDeath = true;
 
         if (store.suddenDeath){
-          if (hasWinner(scores, store.goal)) {
-            store.state = STATES.GAME_OVER;
-            return;
-          }
+          if (hasWinner(scores, store.goal)) { store.state = STATES.GAME_OVER; return; }
         } else {
-          if (hasWinner(scores, store.goal)) {
-            store.state = STATES.GAME_OVER;
-            return;
-          }
+          if (hasWinner(scores, store.goal)) { store.state = STATES.GAME_OVER; return; }
         }
 
         const needExtra = applyCatchUpRule(scores, t, teamPoints);
@@ -1106,7 +1001,6 @@
 
       function render(){
         renderSidebar();
-
         const t = store.activeTeam;
         const o = otherTeam(t);
 
@@ -1131,16 +1025,12 @@
                   <input id="inpGoal" class="input" inputmode="numeric" value="${store.goal}" />
                 </div>
                 <div class="grow">
-                  <label>Handicap inicial</label>
-                  <div class="notice">Equipo A empieza con <b>${START_SCORES[0]}</b> y Equipo B con <b>${START_SCORES[1]}</b>.</div>
+                  <label>Inicio</label>
+                  <div class="notice">Al abrir, ambos equipos empiezan en <b>0</b>. La partida aplica el objetivo cuando pulses <b>Empezar</b>.</div>
                 </div>
               </div>
 
               ${dialHTML({ left:"Extremo izquierdo", right:"Extremo derecho", showTarget:false, target:null, showGuess:true, guess:50 })}
-
-              <div class="notice">
-                Objetivo secreto solo se renderiza en <b>Psíquico</b> y en <b>Revelación</b>.
-              </div>
 
               <div class="row" style="justify-content:space-between;">
                 <span class="pill"><strong>Cartas:</strong> ${CARDS.length}</span>
@@ -1160,7 +1050,6 @@
 
           $("#btnStart").addEventListener("click", () => {
             store.goal = clamp(store.goal, 1, 999);
-
             store.teams[0].score = START_SCORES[0];
             store.teams[1].score = START_SCORES[1];
             store.teams[0].psychicNum = 1;
@@ -1191,9 +1080,7 @@
                   <b style="font-size:14px;">Carta</b>
                   <span class="pill"><strong>${escapeHtml(store.card.left)}</strong> — <strong>${escapeHtml(store.card.right)}</strong></span>
                 </div>
-                <div class="row">
-                  <button class="btn" id="btnNewCard">Otra carta</button>
-                </div>
+                <div class="row"><button class="btn" id="btnNewCard">Otra carta</button></div>
               </div>
 
               ${dialHTML({ left: store.card.left, right: store.card.right, showTarget:false, target:null, showGuess:true, guess:50 })}
@@ -1205,9 +1092,7 @@
                 </div>
               </div>
 
-              <div class="notice">
-                Siguiente: fase <b>Psíquico</b> (solo mira el Psíquico del equipo activo).
-              </div>
+              <div class="notice">Siguiente: fase <b>Psíquico</b> (solo mira el Psíquico del equipo activo).</div>
 
               <div class="row" style="justify-content:space-between;">
                 <button class="btn" id="btnPassToPsychic">Pasar dispositivo</button>
@@ -1232,19 +1117,14 @@
           setPhase("Psíquico (secreto)", `${store.teams[t].name}: el Psíquico ve objetivo y da la pista. Luego oculta y pasa al equipo.`);
           els.main.innerHTML = `
             <div class="col" style="gap:14px;">
-              <div class="notice">
-                <b>Solo el Psíquico</b>. No uses números. Da una pista para orientar la aguja.
-              </div>
-
+              <div class="notice"><b>Solo el Psíquico</b>. No uses números. Da una pista para orientar la aguja.</div>
               ${dialHTML({ left: store.card.left, right: store.card.right, showTarget:true, target: store.target, showGuess:false, guess: store.guess })}
-
               <div class="row">
                 <div class="grow">
                   <label for="inpClue2">Pista (opcional, para registrarla)</label>
                   <input id="inpClue2" class="input" value="${escapeHtml(store.clue)}" placeholder="(Opcional) escribe la pista"/>
                 </div>
               </div>
-
               <div class="row" style="justify-content:space-between;">
                 <button class="btn" id="btnBackCard">Volver (Carta)</button>
                 <button class="btn primary" id="btnHideToTeam">Ocultar objetivo / Pasar al equipo</button>
@@ -1274,19 +1154,12 @@
           els.main.innerHTML = `
             <div class="col" style="gap:14px;">
               <div class="notice">Objetivo oculto. Ajusta la posición (0–100). Luego bloquea.</div>
-
               ${dialHTML({ left: store.card.left, right: store.card.right, showTarget:false, target:null, showGuess:true, guess: store.guess })}
-
               <div class="sliderRow">
                 <label for="rngGuess">Posición (0–100)</label>
                 <input id="rngGuess" type="range" min="0" max="100" value="${store.guess}" aria-label="Selector de posición"/>
-                <div class="numRow">
-                  <span>0</span>
-                  <span>Actual: <b id="gVal">${store.guess}</b></span>
-                  <span>100</span>
-                </div>
+                <div class="numRow"><span>0</span><span>Actual: <b id="gVal">${store.guess}</b></span><span>100</span></div>
               </div>
-
               <div class="row" style="justify-content:space-between;">
                 <button class="btn" id="btnBackPsychic">Volver (Psíquico)</button>
                 <button class="btn primary" id="btnLock">Bloquear respuesta</button>
@@ -1313,7 +1186,7 @@
           $("#btnLock").addEventListener("click", () => {
             if (!confirm(`¿Bloquear posición ${store.guess}?`)) return;
             store.state = STATES.OPPONENT_BET;
-            queuePass("Rival apuesta", `Ahora apuesta ${store.teams[o].name}: LEFT o RIGHT (¿objetivo a la izquierda o a la derecha de la aguja?).`);
+            queuePass("Rival apuesta", `Ahora apuesta ${store.teams[o].name}: LEFT o RIGHT.`);
             render();
           });
           return;
@@ -1323,18 +1196,12 @@
           setPhase("Rival (apuesta)", `${store.teams[o].name}: apuesta LEFT/RIGHT. El objetivo sigue oculto.`);
           els.main.innerHTML = `
             <div class="col" style="gap:14px;">
-              <div class="notice">
-                Apuesta si el objetivo está a la <b>izquierda</b> o a la <b>derecha</b> de la aguja del equipo rival.
-                Si aciertas, robas <b>+1</b> <b>siempre</b>.
-              </div>
-
+              <div class="notice">Si aciertas, robas <b>+1</b> <b>siempre</b>.</div>
               ${dialHTML({ left: store.card.left, right: store.card.right, showTarget:false, target:null, showGuess:true, guess: store.guess })}
-
               <div class="row" style="justify-content:center; gap:12px;">
-                <button class="btn alt" id="btnLeft" aria-label="Apuesta izquierda">LEFT</button>
-                <button class="btn alt" id="btnRight" aria-label="Apuesta derecha">RIGHT</button>
+                <button class="btn alt" id="btnLeft">LEFT</button>
+                <button class="btn alt" id="btnRight">RIGHT</button>
               </div>
-
               <div class="row" style="justify-content:space-between;">
                 <button class="btn" id="btnBackGuess">Volver (Equipo)</button>
                 <button class="btn primary" id="btnReveal" disabled>Revelar</button>
@@ -1343,21 +1210,19 @@
           `;
 
           const btnReveal = $("#btnReveal");
-
           function setBet(bet){
             store.opponentBet = bet;
             $("#btnLeft").classList.toggle("primary", bet==="LEFT");
             $("#btnRight").classList.toggle("primary", bet==="RIGHT");
             btnReveal.disabled = false;
           }
-
           $("#btnLeft").addEventListener("click", () => setBet("LEFT"));
           $("#btnRight").addEventListener("click", () => setBet("RIGHT"));
 
           $("#btnBackGuess").addEventListener("click", () => {
             store.opponentBet = null;
             store.state = STATES.TEAM_GUESS;
-            queuePass("Equipo activo adivina", `Vuelve a adivinar ${store.teams[t].name}. Objetivo oculto.`);
+            queuePass("Equipo activo adivina", `Vuelve a adivinar ${store.teams[t].name}.`);
             render();
           });
 
@@ -1373,27 +1238,19 @@
           const { teamPoints } = scoreGuess(store.target, store.guess);
           const truth = leftRightBet(store.target, store.guess);
           const betOk = store.opponentBet ? (truth==="EITHER" ? true : store.opponentBet===truth) : false;
-          const stealPts = (store.opponentBet && betOk) ? 1 : 0; // ✅ always
+          const stealPts = (store.opponentBet && betOk) ? 1 : 0;
 
           setPhase("Revelación", `Obj: ${store.target} · Pos: ${store.guess} · +${teamPoints} ${store.teams[t].name}${stealPts?` · Rival +${stealPts}`:""}`);
 
           els.main.innerHTML = `
             <div class="col" style="gap:14px;">
               ${dialHTML({ left: store.card.left, right: store.card.right, showTarget:true, target: store.target, showGuess:true, guess: store.guess })}
-
               <div class="row">
                 <span class="pill"><strong>Objetivo:</strong> <span class="mono">${store.target}</span></span>
                 <span class="pill"><strong>Posición:</strong> <span class="mono">${store.guess}</span></span>
                 <span class="pill"><strong>Puntos:</strong> +<span class="mono">${teamPoints}</span></span>
                 <span class="pill"><strong>Robo:</strong> ${store.opponentBet ? `<span class="mono">${store.opponentBet}</span> (${betOk?"acierta":"falla"})${stealPts?` · +${stealPts}`:""}` : "—"}</span>
               </div>
-
-              <div class="notice">
-                <b>Equipo activo:</b> ${escapeHtml(store.teams[t].name)}<br/>
-                <b>Carta:</b> ${escapeHtml(store.card.left)} — ${escapeHtml(store.card.right)}<br/>
-                <b>Pista:</b> ${escapeHtml(store.clue || "—")}
-              </div>
-
               <div class="row" style="justify-content:space-between;">
                 <button class="btn" id="btnBackBet">Volver (Rival)</button>
                 <button class="btn primary" id="btnApply">Aplicar puntos / Siguiente</button>
@@ -1419,9 +1276,7 @@
         if (store.state === STATES.GAME_OVER){
           const scores = [store.teams[0].score, store.teams[1].score];
           const w = winnerIndex(scores);
-          const winner = (w===null) ? "Empate" : store.teams[w].name;
-
-          setPhase("Fin de partida", w===null ? "Empate." : `Ganador: ${winner}`);
+          setPhase("Fin de partida", w===null ? "Empate." : `Ganador: ${store.teams[w].name}`);
           els.main.innerHTML = `
             <div class="col" style="gap:14px;">
               <div class="notice">
@@ -1429,12 +1284,9 @@
                 <div style="margin-top:10px" class="row">
                   <span class="pill"><strong>${escapeHtml(store.teams[0].name)}:</strong> <span class="mono">${scores[0]}</span></span>
                   <span class="pill"><strong>${escapeHtml(store.teams[1].name)}:</strong> <span class="mono">${scores[1]}</span></span>
-                  <span class="pill"><strong>Modo:</strong> ${store.suddenDeath ? "Sudden death" : "Normal"}</span>
                 </div>
               </div>
-
-              ${dialHTML({ left:"—", right:"—", showTarget:false, target:null, showGuess:true, guess: 50 })}
-
+              ${dialHTML({ left:"—", right:"—", showTarget:false, target:null, showGuess:true, guess:50 })}
               <div class="row" style="justify-content:center; gap:10px;">
                 <button class="btn primary" id="btnPlayAgain">Jugar otra vez</button>
                 <button class="btn" id="btnBackSetup">Volver a setup</button>
@@ -1460,10 +1312,7 @@
             render();
           });
 
-          $("#btnBackSetup").addEventListener("click", () => {
-            store.state = STATES.SETUP;
-            render();
-          });
+          $("#btnBackSetup").addEventListener("click", () => { store.state = STATES.SETUP; render(); });
           return;
         }
       }
@@ -1475,16 +1324,9 @@
 
       els.btnFullscreen.addEventListener("click", async () => {
         try{
-          if (!document.fullscreenElement){
-            await document.documentElement.requestFullscreen();
-            showToast("Pantalla completa.");
-          } else {
-            await document.exitFullscreen();
-            showToast("Salir de pantalla completa.");
-          }
-        } catch {
-          showToast("Pantalla completa no disponible.");
-        }
+          if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+          else await document.exitFullscreen();
+        } catch { showToast("Pantalla completa no disponible."); }
       });
 
       els.btnReset.addEventListener("click", () => {
@@ -1507,9 +1349,7 @@
         store.target = null;
         store.guess = 50;
         store.opponentBet = null;
-        store.passQueue = null;
         clearPass();
-        showToast("Reset completado.");
         render();
       });
 
@@ -1519,33 +1359,26 @@
           store.state === STATES.TEAM_GUESS ? `Adivina ${teamLabel(store.activeTeam)} (objetivo oculto).` :
           store.state === STATES.OPPONENT_BET ? `Apuesta ${teamLabel(otherTeam(store.activeTeam))} (objetivo oculto).` :
           store.state === STATES.REVEAL ? `Revelación: puede mirar todo el mundo.` :
-          store.state === STATES.CARD ? `Carta: puede mirar todo el mundo.` :
-          `Listo.`;
+          store.state === STATES.CARD ? `Carta: puede mirar todo el mundo.` : `Listo.`;
         queuePass("Pasar dispositivo", msg);
       });
 
       els.btnPassContinue.addEventListener("click", () => clearPass());
-
-      els.btnNextPA.addEventListener("click", () => { store.teams[0].psychicNum += 1; renderSidebar(); showToast("Equipo A: siguiente psíquico."); });
-      els.btnNextPB.addEventListener("click", () => { store.teams[1].psychicNum += 1; renderSidebar(); showToast("Equipo B: siguiente psíquico."); });
+      els.btnNextPA.addEventListener("click", () => { store.teams[0].psychicNum += 1; renderSidebar(); });
+      els.btnNextPB.addEventListener("click", () => { store.teams[1].psychicNum += 1; renderSidebar(); });
 
       function runSelfTests(){
         const cases = [
-          {t:50,g:50,pts:4},
-          {t:50,g:53,pts:4},
-          {t:50,g:54,pts:3},
-          {t:50,g:56,pts:3},
-          {t:50,g:57,pts:2},
-          {t:50,g:60,pts:2},
-          {t:50,g:61,pts:0},
+          {t:50,g:50,pts:4},{t:50,g:53,pts:4},{t:50,g:54,pts:3},
+          {t:50,g:56,pts:3},{t:50,g:57,pts:2},{t:50,g:60,pts:2},{t:50,g:61,pts:0},
         ];
         for (const c of cases){
           const r = scoreGuess(c.t,c.g);
           if (r.teamPoints !== c.pts) throw new Error(`SelfTest fail scoreGuess t=${c.t} g=${c.g}: got ${r.teamPoints} expected ${c.pts}`);
         }
-        const lr1 = leftRightBet(40,60); if (lr1!=="LEFT") throw new Error("SelfTest fail LEFT");
-        const lr2 = leftRightBet(80,60); if (lr2!=="RIGHT") throw new Error("SelfTest fail RIGHT");
-        const lr3 = leftRightBet(60,60); if (lr3!=="EITHER") throw new Error("SelfTest fail EITHER");
+        if (leftRightBet(40,60)!=="LEFT") throw new Error("SelfTest fail LEFT");
+        if (leftRightBet(80,60)!=="RIGHT") throw new Error("SelfTest fail RIGHT");
+        if (leftRightBet(60,60)!=="EITHER") throw new Error("SelfTest fail EITHER");
         return true;
       }
       try{ runSelfTests(); } catch(e){ console.error(e); showToast("Error interno en tests. Revisa consola.", 4500); }
