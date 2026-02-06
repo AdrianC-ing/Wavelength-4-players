@@ -496,7 +496,7 @@
             </div>
 
             <div class="notice">
-              Rival roba <b>+1</b> si acierta LEFT/RIGHT (objetivo a la izquierda/derecha de la aguja), <b>excepto</b> si el equipo activo hace 4 puntos.
+              Rival roba <b>+1</b> si acierta LEFT/RIGHT, <b>siempre</b> (independiente de los puntos del equipo activo).
             </div>
 
             <div class="hr"></div>
@@ -522,23 +522,23 @@
         <h3>Setup</h3>
         <ul>
           <li>Objetivo: <b>10</b> puntos (editable).</li>
-          <li>Handicap inicial: <b>Equipo A = 0</b>, <b>Equipo B = 1</b> (como en el juego original).</li>
-          <li>Roles: cada turno un equipo es <b>activo</b>. Su <b>Psíquico</b> ve el objetivo y da la pista. Su equipo <b>adivina</b>. El rival solo hace una apuesta <b>LEFT/RIGHT</b>.</li>
+          <li>Handicap inicial: <b>Equipo A = 0</b>, <b>Equipo B = 1</b>.</li>
+          <li>Roles: cada turno un equipo es <b>activo</b>. Su <b>Psíquico</b> ve el objetivo y da la pista. Su equipo <b>adivina</b>. El rival hace apuesta <b>LEFT/RIGHT</b>.</li>
         </ul>
 
         <h3>Flujo de turno</h3>
         <ul>
-          <li><b>1) Carta:</b> se muestra el par de extremos.</li>
-          <li><b>2) Psíquico (secreto):</b> se genera objetivo aleatorio 0–100 y solo lo ve el psíquico.</li>
-          <li><b>3) Equipo:</b> ajusta la aguja (0–100) y bloquea.</li>
-          <li><b>4) Rival:</b> apuesta LEFT/RIGHT (si el objetivo está a la izquierda o a la derecha de la aguja).</li>
-          <li><b>5) Revelación:</b> se muestran objetivo y posición, se calculan puntos y robo.</li>
+          <li><b>1) Carta:</b> extremos visibles para todos.</li>
+          <li><b>2) Psíquico (secreto):</b> objetivo aleatorio 0–100 (solo psíquico).</li>
+          <li><b>3) Equipo:</b> ajusta aguja y bloquea.</li>
+          <li><b>4) Rival:</b> apuesta LEFT/RIGHT (objetivo a izquierda/derecha de la aguja).</li>
+          <li><b>5) Revelación:</b> se muestran objetivo y aguja, se puntúa.</li>
         </ul>
 
         <h3>Puntuación</h3>
         <ul>
           <li>±3: <b>4 puntos</b>, ±6: <b>3 puntos</b>, ±10: <b>2 puntos</b>, fuera: <b>0</b>.</li>
-          <li>El rival gana <b>+1</b> si acierta LEFT/RIGHT, <b>excepto</b> si el equipo activo obtiene <b>4</b>.</li>
+          <li>El rival gana <b>+1</b> si acierta LEFT/RIGHT <b>siempre</b> (independientemente de lo que puntúe el equipo activo).</li>
         </ul>
 
         <h3>Catch-up y fin</h3>
@@ -567,7 +567,6 @@
     (() => {
       "use strict";
 
-      /* ===== Content ===== */
       const CARDS = [
         { left:"Frío", right:"Caliente" },
         { left:"Aburrido", right:"Emocionante" },
@@ -644,12 +643,10 @@
         { left:"Creativo", right:"Convencional" },
       ];
 
-      /* ===== Rules config (reduced bands, as per your final dial) ===== */
       const DEFAULT_GOAL = 10;
-      const START_SCORES = [0, 1]; // A=0, B=1 handicap
-      const WEDGES = { w4: 3, w3: 6, w2: 10 }; // ±3 / ±6 / ±10
+      const START_SCORES = [0, 1];
+      const WEDGES = { w4: 3, w3: 6, w2: 10 };
 
-      /* ===== Utils ===== */
       const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
       const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
       const $ = (sel, root=document) => root.querySelector(sel);
@@ -660,7 +657,6 @@
         }[m]));
       }
 
-      // 0..100 -> radians on upper semicircle: 0=left(π), 50=up(π/2), 100=right(0)
       function valueToRad(v){
         const x = clamp(v,0,100)/100;
         return Math.PI * (1 - x);
@@ -679,15 +675,12 @@
       function leftRightBet(target, guess){
         if (target < guess) return "LEFT";
         if (target > guess) return "RIGHT";
-        return "EITHER"; // exact match
+        return "EITHER";
       }
 
       function applyCatchUpRule(scores, activeTeam, gainedPoints){
-        // Only triggers when active team gains 4 AND is still losing after applying points.
         if (gainedPoints !== 4) return false;
-        const a = scores[activeTeam];
-        const b = scores[1-activeTeam];
-        return a < b;
+        return scores[activeTeam] < scores[1-activeTeam];
       }
 
       function isTieAtGoalOrAbove(scores, goal){
@@ -706,7 +699,6 @@
         return scores[0] > scores[1] ? 0 : 1;
       }
 
-      /* ===== SVG Dial helpers ===== */
       function polarPoint(cx, cy, r, rad){
         return { x: cx + Math.cos(rad)*r, y: cy - Math.sin(rad)*r };
       }
@@ -743,14 +735,13 @@
       function scoringFanSVG(targetVal){
         const cx=200, cy=200;
         const radPerVal = Math.PI / 100;
-        const halfSpan = WEDGES.w2 * radPerVal; // ±10
+        const halfSpan = WEDGES.w2 * radPerVal;
 
         const cRad = valueToRad(targetVal);
 
         let fanStart = cRad + halfSpan;
         let fanEnd   = cRad - halfSpan;
 
-        // shift window to remain within [0..π]
         if (fanStart > Math.PI) {
           const shift = fanStart - Math.PI;
           fanStart = Math.PI;
@@ -876,7 +867,6 @@
         `;
       }
 
-      /* ===== State machine ===== */
       const STATES = Object.freeze({
         SETUP: "SETUP",
         CARD: "CARD",
@@ -902,11 +892,11 @@
         clue: "",
         target: null,
         guess: 50,
-        opponentBet: null, // "LEFT" | "RIGHT"
-        lastResult: null,
+        opponentBet: null,
+
         history: [],
 
-        passQueue: null // {title,text}
+        passQueue: null
       };
 
       function buildDeck(){
@@ -928,10 +918,8 @@
         store.target = null;
         store.guess = 50;
         store.opponentBet = null;
-        store.lastResult = null;
       }
 
-      /* ===== UI wiring ===== */
       const els = {
         main: $("#mainArea"),
         phaseTitle: $("#phaseTitle"),
@@ -987,6 +975,7 @@
       }
 
       function teamLabel(i){ return store.teams[i].name; }
+      function otherTeam(i){ return 1 - i; }
 
       function activeTurnLabel(){
         const t = store.activeTeam;
@@ -1011,7 +1000,6 @@
           : activeTurnLabel();
         els.pillTurn.innerHTML = `<strong>Turno:</strong> ${escapeHtml(turnText)}`;
 
-        // History
         const items = store.history.slice(0,5);
         els.hist.innerHTML = items.length ? items.map(h => `
           <div class="hitem">
@@ -1040,7 +1028,6 @@
         els.passOverlay.classList.remove("show");
       }
 
-      /* ===== Gameplay transitions ===== */
       function nextPsychic(teamIdx){
         store.teams[teamIdx].psychicNum += 1;
       }
@@ -1049,34 +1036,30 @@
         store.activeTeam = teamIdx;
       }
 
-      function otherTeam(teamIdx){ return 1 - teamIdx; }
-
       function pushHistory(entry){
         store.history.unshift(entry);
         if (store.history.length > 20) store.history.length = 20;
       }
 
+      // ✅ FIX: Rival always scores +1 on correct bet (no exception).
       function resolveTurn(){
         const t = store.activeTeam;
         const o = otherTeam(t);
 
         const { teamPoints } = scoreGuess(store.target, store.guess);
 
-        // Determine steal condition
         let stealPts = 0;
         let betOk = false;
 
         const truth = leftRightBet(store.target, store.guess); // LEFT / RIGHT / EITHER
         if (store.opponentBet){
           betOk = (truth === "EITHER") ? true : (store.opponentBet === truth);
-          if (betOk && teamPoints !== 4) stealPts = 1;
+          if (betOk) stealPts = 1; // ALWAYS if correct
         }
 
-        // Apply scores
         store.teams[t].score += teamPoints;
         if (stealPts) store.teams[o].score += stealPts;
 
-        // Record
         pushHistory({
           team: store.teams[t].name,
           card: `${store.card.left} — ${store.card.right}`,
@@ -1089,14 +1072,11 @@
           betOk
         });
 
-        // Determine end/catch-up
         const scores = [store.teams[0].score, store.teams[1].score];
 
-        // Sudden death mode if tie at/above goal
         if (isTieAtGoalOrAbove(scores, store.goal)) store.suddenDeath = true;
 
         if (store.suddenDeath){
-          // In sudden death, just keep playing until not tied (no special rule beyond normal flow).
           if (hasWinner(scores, store.goal)) {
             store.state = STATES.GAME_OVER;
             return;
@@ -1108,10 +1088,8 @@
           }
         }
 
-        // Catch-up rule
         const needExtra = applyCatchUpRule(scores, t, teamPoints);
         if (needExtra){
-          // same team plays again, next psychic
           nextPsychic(t);
           resetTurn();
           store.state = STATES.CARD;
@@ -1119,7 +1097,6 @@
           return;
         }
 
-        // Normal: switch active team, next psychic for the new active team (manual rotation button also available)
         setActiveTeam(o);
         nextPsychic(o);
         resetTurn();
@@ -1127,7 +1104,6 @@
         queuePass("Cambiar de equipo", `Turno para ${store.teams[o].name}. Solo su Psíquico debe mirar el objetivo en la fase Psíquico.`);
       }
 
-      /* ===== Render per state ===== */
       function render(){
         renderSidebar();
 
@@ -1160,17 +1136,10 @@
                 </div>
               </div>
 
-              ${dialHTML({
-                left:"Extremo izquierdo",
-                right:"Extremo derecho",
-                showTarget:false,
-                target:null,
-                showGuess:true,
-                guess: 50
-              })}
+              ${dialHTML({ left:"Extremo izquierdo", right:"Extremo derecho", showTarget:false, target:null, showGuess:true, guess:50 })}
 
               <div class="notice">
-                <b>Importante:</b> el objetivo secreto solo se renderiza en la fase <b>Psíquico</b> y en <b>Revelación</b>.
+                Objetivo secreto solo se renderiza en <b>Psíquico</b> y en <b>Revelación</b>.
               </div>
 
               <div class="row" style="justify-content:space-between;">
@@ -1198,6 +1167,7 @@
             store.teams[1].psychicNum = 1;
             store.teams[0].turns = 0;
             store.teams[1].turns = 0;
+
             store.history = [];
             store.suddenDeath = false;
 
@@ -1226,14 +1196,7 @@
                 </div>
               </div>
 
-              ${dialHTML({
-                left: store.card.left,
-                right: store.card.right,
-                showTarget:false,
-                target:null,
-                showGuess:true,
-                guess: 50
-              })}
+              ${dialHTML({ left: store.card.left, right: store.card.right, showTarget:false, target:null, showGuess:true, guess:50 })}
 
               <div class="row">
                 <div class="grow">
@@ -1255,11 +1218,9 @@
 
           $("#inpClue").addEventListener("input", (e)=>{ store.clue = (e.target.value||"").trim().slice(0, 140); });
           $("#btnNewCard").addEventListener("click", () => { store.card = drawCard(); store.clue=""; render(); });
-          $("#btnPassToPsychic").addEventListener("click", () => {
-            queuePass("Solo Psíquico", `Ahora mira el Psíquico de ${store.teams[t].name}. Objetivo secreto.`);
-          });
+          $("#btnPassToPsychic").addEventListener("click", () => queuePass("Solo Psíquico", `Ahora mira el Psíquico de ${store.teams[t].name}. Objetivo secreto.`));
           $("#btnGoPsychic").addEventListener("click", () => {
-            store.target = randomTarget(); // aleatorio siempre
+            store.target = randomTarget();
             store.state = STATES.PSYCHIC;
             queuePass("Solo Psíquico", `Objetivo generado. Solo el Psíquico de ${store.teams[t].name} debe mirar ahora.`);
             render();
@@ -1275,14 +1236,7 @@
                 <b>Solo el Psíquico</b>. No uses números. Da una pista para orientar la aguja.
               </div>
 
-              ${dialHTML({
-                left: store.card.left,
-                right: store.card.right,
-                showTarget:true,
-                target: store.target,
-                showGuess:false,
-                guess: store.guess
-              })}
+              ${dialHTML({ left: store.card.left, right: store.card.right, showTarget:true, target: store.target, showGuess:false, guess: store.guess })}
 
               <div class="row">
                 <div class="grow">
@@ -1321,14 +1275,7 @@
             <div class="col" style="gap:14px;">
               <div class="notice">Objetivo oculto. Ajusta la posición (0–100). Luego bloquea.</div>
 
-              ${dialHTML({
-                left: store.card.left,
-                right: store.card.right,
-                showTarget:false,
-                target:null,
-                showGuess:true,
-                guess: store.guess
-              })}
+              ${dialHTML({ left: store.card.left, right: store.card.right, showTarget:false, target:null, showGuess:true, guess: store.guess })}
 
               <div class="sliderRow">
                 <label for="rngGuess">Posición (0–100)</label>
@@ -1352,7 +1299,6 @@
           rng.addEventListener("input", () => {
             store.guess = clamp(parseInt(rng.value,10), 0, 100);
             gVal.textContent = store.guess;
-            // re-render dial live without leaking target
             render();
             store.state = STATES.TEAM_GUESS;
           });
@@ -1379,17 +1325,10 @@
             <div class="col" style="gap:14px;">
               <div class="notice">
                 Apuesta si el objetivo está a la <b>izquierda</b> o a la <b>derecha</b> de la aguja del equipo rival.
-                Si aciertas, robas <b>+1</b> (salvo que el rival haga <b>4</b> puntos).
+                Si aciertas, robas <b>+1</b> <b>siempre</b>.
               </div>
 
-              ${dialHTML({
-                left: store.card.left,
-                right: store.card.right,
-                showTarget:false,
-                target:null,
-                showGuess:true,
-                guess: store.guess
-              })}
+              ${dialHTML({ left: store.card.left, right: store.card.right, showTarget:false, target:null, showGuess:true, guess: store.guess })}
 
               <div class="row" style="justify-content:center; gap:12px;">
                 <button class="btn alt" id="btnLeft" aria-label="Apuesta izquierda">LEFT</button>
@@ -1431,24 +1370,16 @@
         }
 
         if (store.state === STATES.REVEAL){
-          // compute result for display only (scoring applied on Next)
           const { teamPoints } = scoreGuess(store.target, store.guess);
           const truth = leftRightBet(store.target, store.guess);
           const betOk = store.opponentBet ? (truth==="EITHER" ? true : store.opponentBet===truth) : false;
-          const stealPts = (store.opponentBet && betOk && teamPoints !== 4) ? 1 : 0;
+          const stealPts = (store.opponentBet && betOk) ? 1 : 0; // ✅ always
 
           setPhase("Revelación", `Obj: ${store.target} · Pos: ${store.guess} · +${teamPoints} ${store.teams[t].name}${stealPts?` · Rival +${stealPts}`:""}`);
 
           els.main.innerHTML = `
             <div class="col" style="gap:14px;">
-              ${dialHTML({
-                left: store.card.left,
-                right: store.card.right,
-                showTarget:true,
-                target: store.target,
-                showGuess:true,
-                guess: store.guess
-              })}
+              ${dialHTML({ left: store.card.left, right: store.card.right, showTarget:true, target: store.target, showGuess:true, guess: store.guess })}
 
               <div class="row">
                 <span class="pill"><strong>Objetivo:</strong> <span class="mono">${store.target}</span></span>
@@ -1537,7 +1468,6 @@
         }
       }
 
-      /* ===== Buttons & global controls ===== */
       els.btnRules.addEventListener("click", () => openModal(els.modalRules));
       els.btnCloseRules.addEventListener("click", () => closeModal(els.modalRules));
       els.modalRules.addEventListener("click", (e)=>{ if (e.target === els.modalRules) closeModal(els.modalRules); });
@@ -1596,11 +1526,9 @@
 
       els.btnPassContinue.addEventListener("click", () => clearPass());
 
-      // Manual psychic rotation controls (as requested)
       els.btnNextPA.addEventListener("click", () => { store.teams[0].psychicNum += 1; renderSidebar(); showToast("Equipo A: siguiente psíquico."); });
       els.btnNextPB.addEventListener("click", () => { store.teams[1].psychicNum += 1; renderSidebar(); showToast("Equipo B: siguiente psíquico."); });
 
-      /* ===== Self-tests (quick sanity) ===== */
       function runSelfTests(){
         const cases = [
           {t:50,g:50,pts:4},
@@ -1622,7 +1550,6 @@
       }
       try{ runSelfTests(); } catch(e){ console.error(e); showToast("Error interno en tests. Revisa consola.", 4500); }
 
-      /* ===== Boot ===== */
       render();
     })();
   </script>
